@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="Generator" content="xnr®">
+    <meta name="Author" content="xxxx-xxx@xx.xx">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <title>首页</title>
+    <link rel="stylesheet" href="inc/layui/css/layui.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        .bor_red {
+            border: 1px #DB0007 solid;
+            color: #DB0007;
+            border-radius: 3px;
+        }
+
+        .tabBtn {
+            background-color: #FFF;
+            border: 1px solid #DB0007;
+            color: #DB0007;
+            padding: 5px;
+            margin-left: 5px;
+            height: 30px;
+        }
+
+        .layui-btn {
+            line-height: 0px;
+        }
+
+        .tabBtn:hover {
+            background-color: #DB0007;
+        }
+
+        .layui-form-onswitch {
+            background-color: #DB0007;
+            border-color: #DB0007;
+        }
+
+        .bgc {
+            background-color: #FFD6D8;
+            height: 5px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .huiy {
+            background-image: url("./img/huiy.png");
+            background-repeat: no-repeat;
+            background-position-x: 40%;
+            height: 26px;
+        }
+    </style>
+</head>
+
+<body>
+
+</body>
+<script type="text/javascript" src="inc/layui/layui.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript">
+    var u = Comm.db('user');
+
+    function pageload() {
+
+        //监听指定开关
+        Comm.form.on('switch(switchTest)', function (data) {
+            //this.checked
+            //layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+        });
+    }
+</script>
+
+</html>

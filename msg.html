@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="Generator" content="xnr®">
+    <meta name="Author" content="xxxx-xxx@xx.xx">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <title>添加商品</title>
+    <link rel="stylesheet" href="inc/layui/css/layui.css">
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .nav {
+            height: 40px;
+            line-height: 40px;
+            border: 1px solid #EEEEEE;
+        }
+
+        .tabBtn {
+            background-color: #FFF;
+            border: 1px solid #DB0007;
+            color: #DB0007;
+        }
+
+        .tabBtn:hover {
+            background-color: #DB0007;
+        }
+
+        .yuanRed {
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            -moz-border-radius: 50%;
+            -webkit-border-radius: 50%;
+        }
+
+        .yuanL {
+            width: 10px;
+            height: 10px;
+            background-color: #ABABAB;
+            border-radius: 50%;
+            -moz-border-radius: 50%;
+            -webkit-border-radius: 50%;
+        }
+
+        .yuanDiv {
+            margin-left: 60px;
+            width: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="form" class="layui-form">
+        <div class="bg_white pad20 mart20 bottomBorder">
+            <div class="flex flex_item_center flex_between" style="height:60px">
+                <div class="f20">系统消息</div>
+                <button class="layui-btn layui-btn-danger marl30 tabBtn" onclick="allRead();">全部标记为已读</button>
+            </div>
+        </div>
+        <div id="dd">
+            <div id="d1" class="flex flex_item_center center f16 col_lgray bg_white bottomBorder" style="height:60px">
+                <div class="layui-col-xs1 yuanDiv">
+                    <div class="yuanRed"></div>
+                </div>
+                <div class="layui-col-xs7 tleft" onclick="Comm.go('msgInfo/msgInfo.html');">
+                    【系统消息】您的2017阿里妈妈推广账单已出炉，还有惊喜礼品等你抽！</div>
+                <div class="layui-col-xs3">01-30&nbsp;15:00:00</div>
+                <div class="layui-col-xs1"><img src="img/delete.png" onclick="del('d1')" /></div>
+            </div>
+            <div id="d2" class="flex flex_item_center center f16 col_lgray bg_white bottomBorder" style="height:60px">
+                <div class="layui-col-xs1 yuanDiv">
+                    <div class="yuanRed"></div>
+                </div>
+                <div class="layui-col-xs7 tleft" onclick="Comm.go('msgInfo/msgInfo.html');">
+                    【系统消息】您的2017阿里妈妈推广账单已出炉，还有惊喜礼品等你抽！</div>
+                <div class="layui-col-xs3">01-30&nbsp;15:00:00</div>
+                <div class="layui-col-xs1"><img src="img/delete.png" onclick="del('d2')" /></div>
+            </div>
+            <div id="d3" class="flex flex_item_center center f16 col_lgray bg_white bottomBorder" style="height:60px">
+                <div class="layui-col-xs1 yuanDiv">
+                    <div class="yuanL"></div>
+                </div>
+                <div class="layui-col-xs7 tleft" onclick="Comm.go('msgInfo/msgInfo.html');">
+                    【系统消息】您的2017阿里妈妈推广账单已出炉，还有惊喜礼品等你抽！</div>
+                <div class="layui-col-xs3">01-30&nbsp;15:00:00</div>
+                <div class="layui-col-xs1"><img src="img/delete.png" onclick="del('d3')" /></div>
+            </div>
+            <div id="d4" class="flex flex_item_center center f16 col_lgray bg_white bottomBorder" style="height:60px">
+                <div class="layui-col-xs1 yuanDiv">
+                    <div class="yuanL"></div>
+                </div>
+                <div class="layui-col-xs7 tleft" onclick="Comm.go('msgInfo/msgInfo.html');">
+                    【系统消息】您的2017阿里妈妈推广账单已出炉，还有惊喜礼品等你抽！</div>
+                <div class="layui-col-xs3">01-30&nbsp;15:00:00</div>
+                <div class="layui-col-xs1"><img src="img/delete.png" onclick="del('d4')" /></div>
+            </div>
+        </div>
+        <div id="none" class="bg_white paddt30 f16 col_lgray hide" style="height:140px;padding-left:60px">暂无未读消息</div>
+    </div>
+</body>
+
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script type="text/javascript" src="inc/layui/layui.js"></script>
+<script type="text/javascript" src="inc/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="inc/ueditor/ueditor.all.min.js"></script>
+<script type="text/javascript" src="inc/area.js"></script>
+
+<script type="text/javascript">
+    function del(d) {
+        $('#' + d).remove();
+        if ($('#dd').children().length == 0) {
+            $('#none').removeClass('hide');
+        }
+        Comm.msg("删除成功");
+    }
+    layui.use('laydate', function () {
+        var laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#test1' //指定元素
+        }); //执行一个laydate实例
+        laydate.render({
+            elem: '#test2' //指定元素
+        });
+    });
+    layui.use('form', function () {
+        var form = layui.form;
+        //全选
+        form.on('checkbox(checkAll)', function (data) {
+            var a = data.elem.checked;
+            if (a == true) {
+                $(".storeId").prop("checked", true);
+                form.render('checkbox');
+            } else {
+                $(".storeId").prop("checked", false);
+                form.render('checkbox');
+            }
+
+        });
+
+
+    });
+
+    function allRead() {
+        $(".yuanRed").addClass('yuanL');
+        Comm.msg("全部已读");
+    }
+
+    function pageload() {
+        if ($('#dd').children().length == 0) {
+            $('#none').removeClass('hide');
+        }
+        //初始化列表
+        Comm.table.render({
+            elem: '#table',
+            url: '/admin/config/all', //列表请求接口
+            skin: 'line',
+            where: { //接口参数
+                sex: -1,
+                enable: -1
+            },
+            cols: [
+                [{
+                    field: 'date',
+                    title: '时间'
+                }, {
+                    field: 'money',
+                    title: '收益金额'
+                }, {
+                    field: 'face',
+                    title: '贡献者'
+                }, {
+                    field: 'state',
+                    title: '状态',
+                }]
+            ],
+            done: function (d, curr, count) {},
+            limit: 5, //分页大小
+            id: 'table',
+            page: true, //是否分页
+        });
+
+    }
+</script>
+
+</html>

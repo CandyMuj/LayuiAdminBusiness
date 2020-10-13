@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="Generator" content="xnr®">
+    <meta name="Author" content="xxxx-xxx@xx.xx">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <title>个人空间</title>
+    <link rel="stylesheet" href="../inc/layui/css/layui.css">
+    <link rel="stylesheet" href="../css/comm.css">
+</head>
+
+<body style="padding: 10px;">
+
+
+<div class="layui-form" id="search-form">
+    <div class="layui-form-item">
+        <button class="layui-btn layui-btn-danger" onclick="opendialog()">新增</button>
+        <div style="float: right;" class="flex">
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-input-inline">
+                    <input class="layui-input" name="customerName" autocomplete="off" placeholder="用户名">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">角色</label>
+                <div class="layui-input-block" style="width:130px;">
+                    <select name="roleId" lay-filter="roleId" lay-verify="select" id="selectRoleid">
+                    </select>
+                </div>
+            </div>
+
+            <!--<div class="layui-inline">
+                <label class="layui-form-label">日期</label>
+                <div class="layui-input-inline">
+                    <input class="layui-input" name="startTime" placeholder="开始时间" laydate id="startTime"
+                           autocomplete="off">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <div class="layui-input-inline">
+                    <input class="layui-input" name="endTime" placeholder="结束时间" laydate id="endTime"
+                           autocomplete="off">
+                </div>
+            </div>-->
+
+            <div class="layui-form-item" style="margin: 0 2em">
+                <button class="layui-btn layui-btn-danger" onclick="Comm.search()">查询</button>
+                <!--<button class="layui-btn layui-btn-primary" onclick="Comm.reset()">重置</button>-->
+            </div>
+        </div>
+    </div>
+</div>
+<table class="layui-hide" id="table" lay-filter="table"></table>
+</body>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="setPassword">设置密码</a>
+    {{#  if(d.renable==1){ }}
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="qi">禁用</a>
+    {{#  } else { }}
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="qi">启用</a>
+    {{#  } }}
+</script>
+
+<script type="text/html" id="formTpl">
+    <div id="form" class="layui-form" style="margin-top: 20px;margin-right:30px;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-inline">
+                <input value="{{d.customerName==undefined?'':d.customerName}}" type="text" name="customerName"
+                       lay-verify="required" autocomplete="off" placeholder="请输入用户名（最多20字）" maxlength="20" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">手机号</label>
+            <div class="layui-input-inline">
+                <input value="{{d.phone==undefined?'':d.phone}}" type="text" name="phone" lay-verify="phone"
+                       autocomplete="off" placeholder="请输入手机号" maxlength="11" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-inline">
+                <input value="" type="password" name="password"
+                       lay-verify="required" autocomplete="off" placeholder="请输入密码（6-20个字符）" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色</label>
+            <div class="layui-input-block" style="width:130px;">
+                <select name="roleId" lay-filter="roleId" id="roleId" lay-verify="select">
+                    <option value="-1">请选择</option>
+                    {{JSON.stringify(d)}}
+                    {{# layui.each(d.a, function(index, item){ }}
+                    <option value='{{item.roleId}}'>{{item.name}}</option>
+                    {{# }); }}
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align: center">
+            <div class="layui-inline">
+                <button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="sub">保存</button>
+                <button class="layui-btn layui-btn-primary" id="closeform">取消</button>
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="formup1">
+    <div id="form1" class="layui-form" style="margin-top: 20px;margin-right:30px;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-inline">
+                <input value="" type="password" name="password"
+                       lay-verify="required" autocomplete="off" placeholder="请输入密码（6-20个字符）" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align: center">
+            <div class="layui-inline">
+                <button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="sub">保存</button>
+                <button class="layui-btn layui-btn-primary" id="closeform1">取消</button>
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="renderRoleSelect">
+    <option value=''>请选择</option>
+    {{# layui.each(d.a, function(index, item){ }}
+    <option value='{{item.roleId}}'>{{item.name}}</option>
+    {{# }); }}
+</script>
+
+<script type="text/javascript" src="../inc/layui/layui.js"></script>
+<script type="text/javascript" src="../inc/g.js"></script>
+<script type="text/javascript" src="../inc/area.js"></script>
+<script type="text/javascript">
+
+    // 下拉框中的角色
+    let selectRole;
+
+    //加载页面
+    function pageload() {
+        //初始化列表
+        Comm.table.render({
+            elem: '#table',
+            url: '/admin/customer/queryUser',//列表请求接口
+            where: {//接口参数
+            },
+            cols: [[
+                {field: 'customerName', title: '用户名', edit: 'text'},
+                {field: 'phone', title: '电话'},
+                {field: 'roleName', title: '角色'},
+                {
+                    field: 'enable', title: '是否启用', renderData: (d) => {
+                        return d.renable == 1 ? "已启用" : "已禁用"
+                    }
+                },
+                {field: '', title: '操作', toolbar: '#barDemo', width: 180},
+            ]],
+            done: function (d, curr, count) {
+            },
+            isremember: true,//分页是否记住选中状态
+            tempid: 'userId',//选中对比id
+            limit: 10,//分页大小
+            limits: [10, 20, 30, 40, 50, 60, 70, 80, 90],
+            id: 'table',
+            page: true,//是否分页
+        });
+
+        AJAX.POST("/admin/customer/queryRole", {}, function (d) {
+            if (d.code == 1) {
+                selectRole = d.data;
+                Comm.laytpl($("#renderRoleSelect").html()).render({a: selectRole}, function (html) {
+                    $('#selectRoleid').html(html);
+                    Comm.form.render('select');
+                });
+            } else {
+                layer.msg("初始化失败!", {icon: 5});
+            }
+        });
+
+        Comm.table.on('edit(table)', function (obj) {
+            var value = obj.value //得到修改后的值
+                , data = obj.data //得到所在行所有键值
+                , field = obj.field; //得到字段
+            AJAX.POST('/admin/customer/modifyName', {customerId: data.customerId, customerName: value}, d => {
+                if (d.code == 1) {
+                    Comm.msg("修改成功!", 1);
+                } else {
+                    Comm.msg(d.msg, 5);
+                }
+            });
+        });
+
+        //监听table列表里按钮点击事件
+        Comm.table.on('tool(table)', function (obj) {
+            if (obj.event == 'update') {//编辑
+                /*查询数据 */
+                AJAX.POST("/admin/customer/queryUserById", {customerId: obj.data.customerId}, function (d) {
+                    if (d.code == 1) {
+                        Comm.laytpl($("#formup").html()).render({a: d.data.cus.rolelist}, function (html) {
+                            layer.open({
+                                type: 1,
+                                title: '修改用户',
+                                area: ['400px', '350px'],
+                                maxmin: true,
+                                content: html,
+                                success: function (layero) {
+                                    Comm.SetData(d.data.cus, 'form')
+                                    //验证必填项
+                                    Comm.form.verify();
+                                    Comm.form.render();
+                                    //提交表单
+                                    Comm.form.on('submit(sub)', function (data) {
+                                        data.field.customerId = obj.data.customerId;
+                                        if (data.field.password.length<6){
+                                            Comm.msg("密码至少设置6个字符")
+                                            return;
+                                        }
+                                        if (data.field.password.length>20){
+                                            Comm.msg("密码最多设置20个字符");
+                                            return ;
+                                        }
+                                        AJAX.POST('/admin/customer/changeRole', data.field, function (d) {
+                                            if (d.code == 1) {
+                                                layer.closeAll();
+                                                layer.msg("更新成功!", {icon: 1});
+                                                Comm.table.reload('table');
+                                            } else {
+                                                layer.msg("更新失败!", {icon: 5});
+                                                Comm.table.reload('table');
+                                            }
+                                        })
+                                    });
+
+                                    $("#closeform").click(function () {
+                                        layer.closeAll();
+                                    })
+                                }
+                            });
+                        })
+                    } else {
+                        Comm.msg(d.msg, 5)
+                    }
+                })
+            } else if (obj.event == 'qi') {  // 启用或禁用用户
+                AJAX.POST('/admin/customer/enable', {customerId: obj.data.customerId}, function (d) {
+                    if (d.code == 1) {
+                        layer.closeAll();
+                        layer.msg("设置成功!", {icon: 1});
+                        Comm.table.reload('table');
+                    } else {
+                        layer.msg("[设置失败]" + d.msg, {icon: 5});
+                    }
+                })
+            } else if (obj.event == 'setPassword') {  // 设置密码
+                Comm.laytpl($("#formup1").html()).render({}, function (html) {
+                    layer.open({
+                        type: 1,
+                        title: '设置密码',
+                        area: ['400px', '200px'],
+                        maxmin: true,
+                        content: html,
+                        success: function (layero) {
+                            //验证必填项
+                            Comm.form.verify();
+                            //提交表单
+                            Comm.form.on('submit(sub)', function (data) {
+                                data.field.customerId = obj.data.customerId;
+                                if (data.field.password.length<6){
+                                    Comm.msg("密码至少设置6个字符",5)
+                                    return;
+                                }
+                                if (data.field.password.length>20){
+                                    Comm.msg("密码最多设置20个字符",5);
+                                    return ;
+                                }
+                                AJAX.POST('/admin/customer/setpass', data.field, function (d) {
+                                    if (d.code == 1) {
+                                        layer.closeAll();
+                                        layer.msg("设置成功!", {icon: 1})
+                                        Comm.table.reload('table');
+                                    } else {
+                                        layer.msg("设置失败!", {icon: 5})
+                                    }
+                                })
+                            });
+                            $("#closeform1").click(function () {
+                                layer.closeAll();
+                            })
+                        }
+                    });
+                })
+            }
+        })
+    }
+
+    /**
+     * 新增账号
+     */
+    function opendialog() {
+        if (selectRole) {
+            Comm.laytpl($("#formTpl").html()).render({a: selectRole}, function (html) {
+                layer.open({
+                    type: 1,
+                    title: '添加管理员账号',
+                    area: ['420px', '360px'],
+                    maxmin: true,
+                    content: html,
+                    success: function (layero) {
+                        Comm.form.render();
+                        //验证必填项
+                        Comm.form.verify();
+                        //提交表单
+                        Comm.form.on('submit(sub)', function (data) {
+                            if (data.field.password.length<6){
+                                Comm.msg("密码至少设置6个字符",5)
+                                return;
+                            }
+                            if (data.field.password.length>20){
+                                Comm.msg("密码最多设置20个字符",5);
+                                return ;
+                            }
+                            AJAX.POST('/admin/customer/add', data.field, function (d) {
+                                if (d.code == 1) {
+                                    layer.closeAll();
+                                    layer.msg("添加成功!", {icon: 1})
+                                    Comm.table.reload('table');
+                                } else {
+                                    layer.msg(d.msg, {icon: 5})
+                                }
+                            })
+                        });
+
+                        $("#closeform").click(function () {
+                            layer.closeAll();
+                        })
+                    }
+                });
+            })
+        }
+    }
+
+
+</script>
+
+</html>

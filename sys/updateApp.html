@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../inc/layui/css/layui.css">
+    <link rel="stylesheet" href="../css/comm.css"/>
+</head>
+<body style="padding: 10px;">
+<div class="layui-form" id="search-form">
+    <div class="layui-form-item">
+        <button class="layui-btn layui-btn-danger" onclick="add()">新增</button>
+        <div style="float: right;">
+            <div class="layui-inline">
+                <label class="layui-form-label">客户端版本</label>
+                <div class="layui-input-inline">
+                    <select name="clientType" lay-filter="clientType" lay-filter="clientType"
+                            id="sssss"
+                            lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">系统类型</label>
+                <div class="layui-input-inline">
+                    <select name="clientSys" lay-filter="clientSys" lay-filter="clientSys"
+                            id="ddddd"
+                            lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="layui-btn layui-btn-danger" onclick="Comm.search()">搜索</button>
+        </div>
+    </div>
+</div>
+<table class="layui-hide" id="table" lay-filter="table"></table>
+</body>
+<script type="text/javascript" src="../inc/layui/layui.js"></script>
+<script type="text/javascript" src="../inc/g.js"></script>
+<script type="text/javascript" src="../inc/dict.js"></script>
+<script type="text/javascript" src="../inc/area.js"></script>
+<script type="text/html" id="renderOption">
+    {{# $.each(d, function(i, item){ }}
+    <option value='{{item.val}}' {{item.sel}}>{{item.cn}}</option>
+    {{# }); }}
+</script>
+<script type="text/html" id="submitUpd">
+    <div id="form" class="layui-form" style="margin-top: 20px;margin-right: 20px;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">版本号</label>
+            <div class="layui-input-inline">
+                <input class="layui-input " id="number" name="number" autocomplete="off" placeholder="版本号">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">更新文件</label>
+            <div class="layui-input-inline">
+                <input class="layui-input " id="url" name="url" autocomplete="off" type="hidden"/>
+                <button type="button" class="layui-btn layui-btn-danger" id="uploadimg">上传</button>
+                <br><a id="updOk" style="color: green"></a>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">更新内容</label>
+            <div class="layui-input-inline">
+                <input class="layui-input " id="content" name="content" autocomplete="off" placeholder="更新内容"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">客户端版本</label>
+            <div class="layui-input-inline">
+                <select name="clientType" lay-filter="clientType" id="clientType" lay-filter="clientType"
+                        lay-verify="required">
+                    {{# $.each(clientType, function(i, item){ }}
+                    <option value='{{item.val}}' {{item.sel}}>{{item.cn}}</option>
+                    {{# }); }}
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">系统类型</label>
+            <div class="layui-input-inline">
+                <select name="clientSys" lay-filter="clientSys" id="clientSys" lay-filter="clientSys"
+                        lay-verify="required">
+                    {{# $.each(clientSys, function(i, item){ }}
+                    <option value='{{item.val}}' {{item.sel}}>{{item.cn}}</option>
+                    {{# }); }}
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"></label>
+            <div class="fr">
+                <button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="sub">保存</button>
+                <button class="layui-btn layui-btn-primary" id="closeform">取消</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    var clientType = [
+        {'cn': '水车车APP', 'val': 1, 'sel': 'selected'}
+    ];
+
+    var clientSys = [
+        {'cn': 'Android', 'val': 1, 'sel': 'selected'}
+        // {'cn': 'IOS', 'val': 2}
+    ];
+
+    //加载页面
+    function pageload() {
+
+        Comm.laytpl($("#renderOption").html()).render(clientType, function (html) {
+            $('#sssss').append(html);
+            Comm.form.render();
+        });
+        Comm.laytpl($("#renderOption").html()).render(clientSys, function (html) {
+            $('#ddddd').append(html);
+            Comm.form.render();
+        });
+
+        //初始化列表
+        Comm.table.render({
+            elem: '#table',
+            url: '/common/update/list',//列表请求接口
+            where: {//接口参数
+
+            },
+            cols: [[
+                {field: 'androidUpdateId', title: 'updateId', width: 150},
+                {field: 'number', title: '版本号', width: 120},
+                {
+                    field: 'url', title: '地址', renderData: (d) => {
+                        var url = d.url;
+                        if (url && url.indexOf("http") == -1) {
+                            url = config.ossroot + url;
+                        }
+                        return "<a href='" + url + "' style='color: blue;' target='_blank'>" + url + "</a>"
+                    }
+                },
+                {field: 'content', title: '更新内容'},
+                {
+                    field: 'clientType', title: '客户端版本', renderData: (d) => {
+                        var val = "错误";
+                        clientType.forEach(item => {
+                            if (d.clientType == item.val) {
+                                val = item.cn;
+                                return;
+                            }
+                        });
+                        return val;
+                    }
+                },
+                {
+                    field: 'clientSys', title: '系统类型', renderData: (d) => {
+                        var val = "错误";
+                        clientSys.forEach(item => {
+                            if (d.clientSys == item.val) {
+                                val = item.cn;
+                                return;
+                            }
+                        });
+                        return val;
+                    }
+                },
+                {field: 'addTime', title: '更新时间'}
+            ]],
+            limit: 10,//分页大小
+            id: 'table',
+            page: true,//是否分页
+            height: 'full-' + ($(".layui-form").height() + 50),//计算table底部距离
+        });
+    }
+
+    function add() {
+        Comm.laytpl($("#submitUpd").html()).render({}, function (html) {
+            //多窗口模式，层叠置顶
+            layer.open({
+                type: 1,
+                title: "发布更新",
+                shade: 0.3,
+                area: ['600px', '440px'],
+                // maxmin: true,
+                content: html,
+                zIndex: layer.zIndex,  //重点1
+                success: function (layero) {
+                    //初始化上传控件
+                    Comm.upload.render({
+                        elem: '#uploadimg', //绑定元素
+                        field: 'file',
+                        accept: 'file',
+                        acceptMime: 'application/vnd.android.package-archive',
+                        url: config.ossroot,
+                        before: function (obj, o) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                            //上传loading
+                            layer.load();
+                        },
+                        done: function (d) {
+                            layer.closeAll('loading'); //关闭loading
+                            $("#updOk").attr("href", Comm.OSS.getImgUrl(this.data.key)+"?response-content-type=application%2Foctet-stream").html("已上传，点击下载");
+                            $("#url").val(this.data.key);
+                            layer.msg('上传成功', {time: 2000});
+                        },
+                        error: function () {
+                            //请求异常回调
+                            layer.closeAll('loading'); //关闭loading
+                            layer.msg('上传失败', {time: 2000});
+                        }
+                    });
+
+                    Comm.form.render();
+                    //监听指定开关
+                    Comm.form.on('submit(sub)', function (data) {
+                        submitUpd(data.field);
+                    });
+                    $("#closeform").click(function () {
+                        layer.closeAll();
+                    })
+                },
+            });
+        })
+    }
+
+    function submitUpd(params) {
+        AJAX.POST("/common/update/submit", params, function (d) {
+            if (d.code == 1) {
+                //刷新列表
+                Comm.table.reload('table');
+                Comm.msg("发布成功!", 1);
+                layer.closeAll();
+            } else {
+                Comm.msg("发布失败! [" + d.msg + "]", 5)
+            }
+        })
+    }
+
+</script>
+</html>

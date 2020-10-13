@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="Generator" content="xnr®">
+    <meta name="Author" content="xxxx-xxx@xx.xx">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <title>菜单管理</title>
+    <link rel="stylesheet" href="../inc/layui/css/layui.css">
+    <link rel="stylesheet" href="../css/comm.css">
+    <style>
+        .layui-btn-xstree {
+            height: 35px;
+            line-height: 35px;
+            padding: 0px 5px;
+            font-size: 12px;
+        }
+
+        .layui-form-radio {
+            display: inline-block;
+            vertical-align: middle;
+            line-height: 28px;
+            margin: 6px 10px 0 0;
+            padding-right: 10px;
+            cursor: pointer;
+            font-size: 0;
+        }
+
+        .layui-border-box {
+            height: auto !important;
+        }
+    </style>
+</head>
+
+<body>
+<div class="demoTable" style="margin-bottom: 10px;">
+    <!--<button class="layui-btn layui-btn-danger" data-type="add">新增菜单</button>-->
+</div>
+<table class="layui-hidden" id="treeTable" lay-filter="treeTable"></table>
+</body>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+</script>
+<script type="text/html" id="formTpl">
+    <div id="form" class="layui-form" style="margin-top: 20px;margin-right: 20px;">
+        <input type="hidden" value="{{d.pid}}" name="pid" id="pid"/>
+        <input type="hidden" value="{{d.menuId}}" name="menuId" id="menuId"/>
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单名称</label>
+            <div class="layui-input-block">
+                <input value="{{d.menuName}}" type="text" name="menuName" lay-verify="required" id="menuName"
+                       autocomplete="off" placeholder="请输入菜单名称" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单url</label>
+            <div class="layui-input-block">
+                <input value="{{d.url}}" type="text" name="url" id="url" autocomplete="off" placeholder="请输入菜单url"
+                       class="layui-input"/>
+            </div>
+        </div>
+        <!--<div class="layui-form-item">
+            <label class="layui-form-label">菜单icon</label>
+            <div class="layui-input-block">
+                <input value="{{d.icon}}" type="text" name="icon" id="icon" autocomplete="off" placeholder="请输入菜单icon"
+                       class="layui-input"/>
+            </div>
+        </div>-->
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单排序</label>
+            <div class="layui-input-block">
+                <input value="{{d.orderindex}}" type="number" name="orderindex" lay-verify="required" id="orderindex"
+                       autocomplete="off"
+                       placeholder="请输入菜单排序" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="fr">
+                <button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="sub">保存</button>
+                <button class="layui-btn layui-btn-primary" id="closeform">取消</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript" src="../inc/g.js"></script>
+<script type="text/javascript" src="../inc/dict.js"></script>
+<script type="text/javascript" src="../inc/layui/layui.js"></script>
+<script type="text/javascript">
+
+    /**
+     * 对layui进行全局配置
+     */
+    layui.extend({
+        treeGrid: '../../inc/layui/lay/treeGrid'
+    });
+
+    function pageload() {
+        layui.use(['tree', 'treeGrid'], function () {
+            Comm.treeGrid = layui.treeGrid, active = {
+                add: function () {
+                    save(null, 0)
+                }
+            };
+            Comm.treeGrid.render({
+                id: 'treeTable'
+                , elem: '#treeTable'
+                , url: '/admin/menu/list'
+                , cellMinWidth: 100
+                , idField: 'menuId'//必須字段
+                , treeId: 'menuId'//树形id字段名称
+                , treeUpId: 'pid'//树形父id字段名称
+                , treeShowName: 'menuName'//以树形式显示的字段
+                , heightRemove: [".dHead", 100]//不计算的高度,表格设定的是固定高度，此项不生效
+                , height: '100%'
+                , isFilter: false
+                , iconOpen: true//是否显示图标【默认显示】
+                , isOpenDefault: true//节点默认是展开还是折叠【默认展开】
+                , loading: true
+                , method: 'get'
+                , cols: [[
+                    , {field: 'menuId', title: 'id', width: 80}
+                    , {field: 'menuName', title: '菜单名称', width: 300}
+                    , {field: 'pid', title: '父级id', width: 80}
+                    , {field: 'url', title: '链接'}
+                    // , { field: 'icon', title: 'icon' }
+                    , {field: 'orderindex', title: '排序', width: 80}
+                    // , {
+                    //     title: '操作', width: 180, align: 'center', templet: function (d) {
+                    //         var addBtn = '<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="add">添加子级</a>';
+                    //         var editBtn = '<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>';
+                    //         var delBtn = '<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>';
+                    //         return addBtn + editBtn + delBtn;
+                    //     }
+                    // }
+                ]]
+                , isPage: false
+                , parseData: function (res) {//数据加载后回调
+                    return res;
+                }
+                , onClickRow: function (index, o) {
+                    console.log(index, o, "单击！");
+                }
+                , onDblClickRow: function (index, o) {
+                    console.log(index, o, "双击");
+                }
+            });
+
+            Comm.treeGrid.on('tool(treeTable)', function (obj) {
+                if (obj.event === 'edit') {//修改行
+                    save(obj.data)
+                } else if (obj.event === "add") {//添加行
+                    save(null, obj.data.menuId)
+                } else if (obj.event === "del") {//删除
+                    Comm.confirm('确认删除吗？', function () {
+                        AJAX.POST('/admin/menu/del', {menuId: obj.data.menuId}, function (d) {
+                            if (d.code == 1) {
+                                layer.msg("删除成功!", {icon: 1})
+                                //执行重载
+                                Comm.treeGrid.reload('treeTable', {});
+                            } else {
+                                layer.msg("删除失败!", {icon: 5})
+                            }
+                        })
+                    })
+                }
+            });
+
+            //添加按钮点击事件
+            $('.demoTable .layui-btn').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            //保存方法
+            function save(d, pid) {
+                var title = "新增菜单", url = "/admin/menu/add"
+                if (d != null) {
+                    title = "编辑菜单", url = "/admin/menu/update"
+                } else {
+                    d = {menuName: "", url: "", icon: "", sort: "", pid: pid, menuId: ''};
+                }
+                Comm.laytpl($("#formTpl").html()).render(d, function (html) {
+
+                    title = title + (d.menuName != "" ? "-" + d.menuName : "")
+                    Comm.laytpl($("#formTpl").html()).render(d, function (html) {
+                        //多窗口模式，层叠置顶
+                        layer.open({
+                            type: 1,
+                            title: title,
+                            shade: 0.3,
+                            area: ['600px', '360px'],
+                            //maxmin: true,
+                            content: html,
+                            zIndex: layer.zIndex,  //重点1
+                            success: function (layero) {
+                                Comm.form.verify();
+                                //监听指定开关
+                                Comm.form.on('submit(sub)', function (data) {
+                                    AJAX.POST(url, data.field, function (d) {
+                                        if (d.code == 1) {
+                                            layer.closeAll();
+                                            layer.msg("保存成功!", {icon: 1})
+                                            //执行重载
+                                            Comm.treeGrid.reload('treeTable', {});
+                                        } else {
+                                            layer.msg("保存失败!", {icon: 5})
+                                        }
+                                    })
+                                });
+                                $("#closeform").click(function () {
+                                    layer.closeAll();
+                                })
+                            },
+                        });
+                    })
+                })
+            }
+        });
+    }
+
+</script>
+
+</html>

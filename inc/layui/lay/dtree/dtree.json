@@ -1,0 +1,50 @@
+{
+    "code": 200,
+    "msg": "操作成功",
+    "data": [
+        {
+            "id": "001",
+            "title": "湖南省",
+            "isLast": false,
+            "level": "",
+            "parentId": "0",
+            "checkArr": [{"type": "0", "isChecked": "0"}],
+            "children": [
+                {
+                    "id": "001001",
+                    "title": "长沙市",
+                    "isLast": false,
+                    "level": "2",
+                    "checkArr": [{"type": "0", "isChecked": "0"}],
+                    "parentId": "001",
+                    "children": [
+                        {
+                            "id": "001001001",
+                            "title": "ddd",
+                            "isLast": true,
+                            "level": "3",
+                            "checkArr": [{"type": "0", "isChecked": "0"}],
+                            "parentId": "001001"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "002",
+            "title": "湖北省",
+            "isLast": false,
+            "level": "1",
+            "parentId": "0",
+            "checkArr": [{"type": "0", "isChecked": "0"}],
+            "children": [{
+                "id": "001002",
+                "title": "武汉市",
+                "isLast": true,
+                "level": "2",
+                "checkArr": [{"type": "0", "isChecked": "0"}],
+                "parentId": "002"
+            }]
+        }
+    ]
+}

@@ -1,0 +1,219 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="Generator" content="xnr®">
+    <meta name="Author" content="xxxx-xxx@xx.xx">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <title>角色管理</title>
+    <link rel="stylesheet" href="../inc/layui/css/layui.css">
+    <link rel="stylesheet" href="../css/comm.css">
+    <style>
+        .layui-border-box {
+            height: auto !important;
+        }
+    </style>
+</head>
+
+<body class="layui-layout-body">
+<div class="layui-form" id="search-form">
+    <div class="layui-form-item">
+        <button class="layui-btn layui-btn-danger marl30" onclick="opendialog()">新增</button>
+    </div>
+</div>
+<table class="layui-hide" id="table" lay-filter="table"></table>
+</body>
+<script type="text/html" id="formTpl">
+    <div id="form" class="layui-form" style="margin-top: 20px;margin-right:30px;">
+        <input type="hidden" value="{{d.roleId?d.roleId:''}}" name="roleId"/>
+        <input type="hidden" value="1" name="status"/>
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色名称</label>
+            <div class="layui-input-block">
+                <input value="{{d.name?d.name:''}}" type="text" name="name" lay-verify="required" id="name"
+                       autocomplete="off" placeholder="请输入角色名称（最多20字）" maxlength="20" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">选择菜单</label>
+            <div class="layui-input-block">
+                <table class="layui-hidden" id="treeTable" lay-filter="treeTable"></table>
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align: center">
+            <div class="layui-inline">
+                <button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="sub">保存</button>
+                <button class="layui-btn layui-btn-primary" id="closeform">关闭</button>
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="edit">编辑</a>
+    <!--<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>-->
+</script>
+<script type="text/javascript" src="../inc/layui/layui.js"></script>
+<script type="text/javascript" src="../inc/g.js"></script>
+<script type="text/javascript">
+    var notShow = [
+        '分公司'
+    ];
+
+    layui.extend({
+        treeGrid: '../../inc/layui/lay/treeGrid'
+    });
+
+    //加载页面
+    function pageload() {
+        layui.use(['tree', 'treeGrid'], function () {
+            Comm.treeGrid = layui.treeGrid;
+        });
+        //初始化列表
+        Comm.table.render({
+            elem: '#table',
+            url: '/admin/role/query',//列表请求接口
+            where: {//接口参数
+                sex: -1,
+                enable: -1
+            },
+            cols: [[
+                {field: 'name', title: '角色名称'},
+                {field: 'menuId', title: '菜单id'},
+                {field: 'status', title: '操作', toolbar: '#barDemo', width: 180},
+            ]],
+            parseData: function (res) {//数据加载后回调
+                if (!Comm.db('isgod')) {
+                    let data = [];
+                    for (let i in res.data) {
+                        if (res.data[i].name.indexOf(notShow) == -1) {
+                            data.push(res.data[i]);
+                        }
+                    }
+                    res.data = data;
+                }
+                return res;
+            },
+            done: function (d, curr, count) {
+            },
+            id: 'table',
+            page: false,//是否分页
+            height: 'full-' + ($(".layui-form").height() + 40),//计算table底部距离
+        });
+
+        //监听table列表里按钮点击事件
+        Comm.table.on('tool(table)', function (obj) {
+            if (obj.event == 'edit') {
+                opendialog(obj.data);
+            } else if (obj.event == 'del') {
+                Comm.confirm('确定删除？', function () {
+                    AJAX.POST('admin/role/delete', {roleId: obj.data.roleId}, function (d) {
+                        if (d.code == 1) {
+                            layer.closeAll();
+                            layer.msg("删除成功!", {icon: 1})
+                            //执行重载
+                            Comm.table.reload('table');
+                        } else {
+                            layer.msg("删除失败!", {icon: 5})
+                        }
+                    })
+                })
+            }
+        });
+    }
+
+    //小窗口编辑
+    function opendialog(d) {
+        var title = "编辑";
+        var url = "/admin/role/update";
+        if (d == undefined) {
+            title = "新增";
+            url = "/admin/role/add";
+        }
+        d = d == undefined ? {} : d;
+
+        Comm.laytpl($("#formTpl").html()).render(d, function (html) {
+            layer.open({
+                type: 1,
+                title: title,
+                area: ['600px', '80%'],
+                maxmin: true,
+                move: false,
+                content: html,
+                success: function (layero) {
+                    Comm.treeGrid.render({
+                        id: 'treeTable'
+                        , elem: '#treeTable'
+                        , url: '/admin/menu/list'
+                        , idField: 'menuId'//必須字段
+                        , treeId: 'menuId'//树形id字段名称
+                        , treeUpId: 'pid'//树形父id字段名称
+                        , treeShowName: 'menuName'//以树形式显示的字段
+                        , heightRemove: [".dHead", 350]//不计算的高度,表格设定的是固定高度，此项不生效
+                        , isFilter: false
+                        , iconOpen: true//是否显示图标【默认显示】
+                        , isOpenDefault: false//节点默认是展开还是折叠【默认展开】
+                        , loading: true
+                        , method: 'get'
+                        , cols: [[
+                            , {type: 'checkbox', field: 'menuId', width: 80, align: 'center'}
+                            , {field: 'menuName', title: '菜单名称'}
+                        ]]
+                        , isPage: false
+                        , parseData: function (res) {
+                            if (d.menuId) {
+                                d.menuId = d.menuId.split(',');
+                                if (d.menuId && d.menuId.length > 0) {
+                                    for (var i = 0; i < d.menuId.length; i++) {
+                                        for (var j = 0; j < res.data.length; j++) {
+                                            if (d.menuId[i] == res.data[j].menuId) {
+                                                res.data[j].lay_is_checked = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            return res;
+                        }
+                    });
+
+                    //验证必填项
+                    Comm.form.verify();
+                    //提交表单
+                    Comm.form.on('submit(sub)', function (data) {
+                        var menuIds = [];
+                        var d = Comm.treeGrid.checkStatus('treeTable');//获取选中的数据
+                        if (d.data.length > 0) {
+                            for (var i = 0; i < d.data.length; i++) {
+                                menuIds.push(d.data[i].menuId)
+                            }
+                        }
+                        if (menuIds.length <= 0) {
+                            layer.msg("请选择菜单!", {icon: 5});
+                            return;
+                        }
+                        data.field.menuId = menuIds.join(',');
+                        AJAX.POST(url, data.field, function (d) {
+                            if (d.code == 1) {
+                                layer.closeAll();
+                                layer.msg("保存成功!", {icon: 1});
+                                //执行重载
+                                Comm.table.reload('table');
+                            } else {
+                                layer.msg("[保存失败]" + d.msg, {icon: 5});
+                            }
+                        })
+                    });
+                    $("#closeform").click(function () {
+                        layer.closeAll();
+                    })
+                }
+            });
+        })
+
+    }
+</script>
+
+</html>

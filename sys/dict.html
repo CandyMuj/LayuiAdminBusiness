@@ -1,0 +1,475 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="Generator" content="xnr®">
+    <meta name="Author" content="xxxx-xxx@xx.xx">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <title>字典配置</title>
+    <link rel="stylesheet" href="../inc/layui/css/layui.css">
+    <link rel="stylesheet" href="../css/comm.css">
+    <style>
+        .layui-btn-xstree {
+            height: 35px;
+            line-height: 35px;
+            padding: 0px 5px;
+            font-size: 12px;
+        }
+
+        .layui-form-radio {
+            display: inline-block;
+            vertical-align: middle;
+            line-height: 28px;
+            margin: 6px 10px 0 0;
+            padding-right: 10px;
+            cursor: pointer;
+            font-size: 0;
+        }
+
+        .layui-border-box {
+            height: auto !important;
+        }
+    </style>
+</head>
+
+<body>
+<div class="demoTable" style="margin-bottom: 10px;">
+    <button class="layui-btn layui-btn-danger" data-type="add">新增基节点</button>
+</div>
+<table class="layui-hidden" id="treeTable" lay-filter="treeTable"></table>
+</body>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+</script>
+<script type="text/html" id="formTpl">
+    <div id="form" class="layui-form" style="margin-top: 20px;margin-right: 20px;">
+        <input type="hidden" value="{{d.dictpid}}" name="pid" id="pid"/>
+        <input type="hidden" value="{{d.dictId}}" name="id" id="id"/>
+        <div class="layui-form-item">
+            <label class="layui-form-label">字典名称</label>
+            <div class="layui-input-block">
+                <input value="{{d.dictname}}" type="text" name="name" lay-verify="required" id="name"
+                       autocomplete="off" placeholder="请输入配置名称" class="layui-input"/>
+            </div>
+        </div>
+
+        {{# if(!d.isUpd){ }}
+        <div class="layui-form-item">
+            <label class="layui-form-label">字典code</label>
+            <div class="layui-input-block">
+                <input value="{{d.dictcode}}" type="text" name="code" lay-verify="required" id="code"
+                       autocomplete="off" placeholder="请输入配置值" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">子集权限</label>
+            <div class="layui-input-block">
+                <!-- <input value="{{d.childrenLimit}}" type="text" name="limit" lay-verify="required" id="limit"
+                        autocomplete="off" placeholder="0不限制，1不能更新，2不能增加子列，3只读(相当于1+2)" class="layui-input"/>-->
+
+                <select name="limit" lay-filter="limit" id="limit">
+                    <option value="0">无限制</option>
+                    <option value="1">不能更新</option>
+                    <option value="2" selected>不能增加子列</option>
+                    <option value="3">只读</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-block">
+                <textarea name="remark" id="remark" autocomplete="off" placeholder="如果扩展内容请使用json格式"
+                          class="layui-textarea">{{d.remark}}</textarea>
+            </div>
+        </div>
+        {{# } }}
+
+        {{# if(d.istoUpload){ }}
+        <div class="layui-form-item">
+            <label class="layui-form-label">图标</label>
+            <div class="layui-input-block">
+                <div class="layui-upload">
+                    <button type="button" class="layui-btn layui-btn-danger" id="btnimg">上传图片</button>
+                    <div class="layui-upload-list">
+                        <div id="uploadimg">
+                        </div>
+                        <br>
+                        <span class="f12">建议：400px*400px，1M以内</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{# } else { }}
+        <!--<div class="layui-form-item">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-block">
+                <textarea name="remark" id="remark" autocomplete="off" placeholder="如果扩展内容请使用json格式"
+                          class="layui-textarea">{{d.remark}}</textarea>
+            </div>
+        </div>-->
+        {{# } }}
+
+        <div class="layui-form-item" style="text-align: center">
+            <div class="layui-inline">
+                <button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="sub">保存</button>
+                <button class="layui-btn layui-btn-primary" id="closeform">取消</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript" src="../inc/g.js"></script>
+<script type="text/javascript" src="../inc/dict.js"></script>
+<script type="text/javascript" src="../inc/layui/layui.js"></script>
+<script type="text/javascript">
+    GDict.init();
+
+    // 如分类这些东西，需要上传图片，这里配置需要上传图标的dictCode(只需要配置父节点的即可）
+    var toUploadCode = [
+        // 'goodsCategory'
+    ];
+
+    // 设置屏蔽展示的父节点code
+    var notShow = [
+        // GDict.getItemc('role').dictId
+    ];
+
+
+    /**
+     * 对layui进行全局配置
+     */
+    layui.extend({
+        treeGrid: '../../inc/layui/lay/treeGrid'
+    });
+
+    function pageload() {
+        layui.use(['tree', 'treeGrid'], function () {
+            Comm.treeGrid = layui.treeGrid, active = {
+                add: function () {
+                    save(null, 0)
+                }
+            };
+            Comm.treeGrid.render({
+                id: 'treeTable'
+                , elem: '#treeTable'
+                , url: '/api/dict/getlist'
+                , cellMinWidth: 100
+                , idField: 'dictId'//必須字段
+                , treeId: 'dictId'//树形id字段名称
+                , treeUpId: 'dictpid'//树形父id字段名称
+                , treeShowName: 'dictname'//以树形式显示的字段
+                , heightRemove: [".dHead", 100]//不计算的高度,表格设定的是固定高度，此项不生效
+                , height: '100%'
+                , isFilter: false
+                , iconOpen: true//是否显示图标【默认显示】
+                , isOpenDefault: true//节点默认是展开还是折叠【默认展开】
+                , loading: true
+                , method: 'get'
+                , cols: [[
+                    , {type: '', align: 'center', width: 80}
+                    , {field: 'dictname', title: '名称', width: 300}
+                    , {field: 'dictcode', title: 'code', width: 150}
+                    , {field: 'dicttype', title: 'type', width: 150}
+                    , {field: 'dictId', title: 'id', width: 80}
+                    , {field: 'dictpid', title: '父级id', width: 80}
+                    , {
+                        field: 'remark', title: '备注', templet: d => {
+                            if (getIsUpload(d.dictpid) && d.remark) {
+                                return Comm.OSS.imghtml(d.remark, 1);
+                            } else {
+                                return d.remark;
+                            }
+                        }
+                    }
+                    // , {
+                    //     field: 'enable', title: '是否可用', renderData: function (d) {
+                    //         console.info(d.enable)
+                    //         if (d.enable == 1) {
+                    //             return "启用";
+                    //         } else {
+                    //             return "禁用";
+                    //         }
+                    //     }
+                    // }
+                    , {
+                        title: '操作', width: 200, align: 'center', templet: function (d) {
+                            let btn = '';
+                            if (d.dictpid <= 0 && d.enable == 1) {
+                                btn += '<a class="layui-btn layui-btn-primary  layui-btn-xs" lay-event="add">添加子级</a>';
+                            }
+
+                            d = GDict.getItem(d.dictpid);
+                            if (d) {
+                                if (d.childrenLimit != 2 && d.childrenLimit != 3) {
+                                    btn += '<a class="layui-btn layui-btn-primary  layui-btn-xs" lay-event="add">添加子级</a>';
+                                }
+                                if (d.childrenLimit != 3) {
+                                    // if (d.dictpid != 0) {
+                                        if (d.childrenLimit != 1) {
+                                            btn += '<a class="layui-btn layui-btn-primary  layui-btn-xs" lay-event="edit">修改</a>';
+                                        }
+                                        // if (d.enable == 0)
+                                        //     btn += '<a class="layui-btn layui-btn-danger  layui-btn-xs" lay-event="start">启用</a>';
+                                        // else
+                                        //     btn += '<a class="layui-btn layui-btn-danger  layui-btn-xs" lay-event="disable">禁用</a>';
+                                    // }
+                                }
+
+                                //var ttopBtn = '<a class="layui-btn layui-btn-primary  layui-btn-xs" lay-event="ttop">置顶</a>';
+                                //var topBtn = '<a class="layui-btn layui-btn-primary  layui-btn-xs" lay-event="top">上移</a>';
+                                //var downBtn = '<a class="layui-btn layui-btn-primary  layui-btn-xs" lay-event="down">下移</a>';
+                            }
+                            return btn; //+ ttopBtn + topBtn + downBtn;
+                        }
+                    }
+                ]]
+                , isPage: false
+                , parseData: function (res) {//数据加载后回调
+                    if (!Comm.db('isgod')) {
+                        let tdata = [];
+                        for (var i = 0; i < res.data.length; i++) {
+                            var r = res.data[i];
+                            if (notShow.indexOf(r.dictId) == -1 && notShow.indexOf(r.dictpid) == -1) {
+                                tdata.push(r);
+                            }
+                        }
+                        res.data = tdata;
+                        return res;
+                    }
+                }
+                , onClickRow: function (index, o) {
+                    // console.log(index, o, "单击！");
+                }
+                , onDblClickRow: function (index, o) {
+                    // console.log(index, o, "双击");
+                }
+            });
+
+            Comm.treeGrid.on('tool(treeTable)', function (obj) {
+                if (obj.event === 'edit') {//修改行
+                    save(obj.data, obj.data.dictpid)
+                } else if (obj.event === "add") {//添加行
+                    save(null, obj.data.dictId)
+                } else if (obj.event === "ttop") {//置顶
+                    uporder(0, obj.data.dictId)
+                } else if (obj.event === "top") {//上移
+                    uporder(-1, obj.data.dictId)
+                } else if (obj.event === "down") {//下移
+                    uporder(1, obj.data.dictId)
+                } else if (obj.event === "start") {//启用
+                    Comm.confirm('确认启用吗？', function () {
+                        AJAX.POST('/admin/dict/enableitem', {id: obj.data.dictId, enable: 1}, function (d) {
+                            if (d.code == 1) {
+                                layer.msg("启用成功!", {icon: 1});
+                                //执行重载
+                                Comm.treeGrid.reload('treeTable', {});
+                            } else {
+                                layer.msg("启用失败!" + d.msg, {icon: 5})
+                            }
+                        })
+                    })
+                } else if (obj.event === "disable") {//禁用
+                    Comm.confirm('确认禁用吗？', function () {
+                        AJAX.POST('/admin/dict/enableitem', {id: obj.data.dictId, enable: 0}, function (d) {
+                            if (d.code == 1) {
+                                layer.msg("禁用成功!", {icon: 1});
+                                //执行重载
+                                Comm.treeGrid.reload('treeTable', {});
+                            } else {
+                                layer.msg("禁用失败!" + d.msg, {icon: 5})
+                            }
+                        })
+                    })
+                }
+            });
+
+            //编辑
+            function uporder(n, id) {
+                AJAX.POST('/admin/dict/uporder', {dictId: id, direction: n}, function (d) {
+                    if (d.code == 1) {
+                        window.sessionStorage["__dict"] = "";
+                        //执行重载
+                        Comm.treeGrid.reload('treeTable', {});
+                        layer.msg("操作成功!", {icon: 1})
+                    } else {
+                        layer.msg(d.msg, {icon: 5})
+                    }
+                })
+            }
+
+            //添加按钮点击事件
+            $('.demoTable .layui-btn').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            //保存方法
+            function save(d, pid) {
+                var title = "新增字典配置", url = "/admin/dict/addgroup";
+                if (d != null) {
+                    title = "编辑字典配置", url = "/admin/dict/modify";
+
+                    // 标识为更新，因为接口只提供了更新名称，所以要判断显示的内容
+                    d.isUpd = true;
+
+                    // 是否具有上传图标的功能
+                    d.istoUpload = getIsUpload(pid);
+                } else {
+                    d = {
+                        dictname: "",
+                        dictcode: "",
+                        dicttype: "",
+                        remark: "",
+                        dictpid: pid,
+                        dictId: '',
+                        childrenLimit: '',
+                        istoUpload: getIsUpload(pid)
+                    };
+                }
+                Comm.laytpl($("#formTpl").html()).render(d, function (html) {
+                    title = title + (d.dictname != "" ? "-" + d.dictname : "")
+                    Comm.laytpl($("#formTpl").html()).render(d, function (html) {
+                        //多窗口模式，层叠置顶
+                        layer.open({
+                            type: 1,
+                            title: title,
+                            shade: 0.3,
+                            area: ['630px', '410px'],
+                            //maxmin: true,
+                            content: html,
+                            // zIndex: layer.zIndex,  //重点1
+                            success: function (layero) {
+                                if (d.istoUpload) {
+                                    initUpload();
+                                    if (d.remark) {
+                                        top.Comm.OSS.inithtml({key: d.remark}, function (html) {
+                                            $('#uploadimg').append(html);
+                                        });
+                                    }
+                                }
+
+                                Comm.form.render();
+
+                                Comm.form.verify();
+                                //监听指定开关
+                                Comm.form.on('submit(sub)', function (data) {
+                                    if (d.istoUpload) {
+                                        if (GDict.getItemc('goodsCategory').dictId == data.field.pid) {
+                                            data.field.limit = 0;
+                                        } else {
+                                            data.field.limit = 2;
+                                        }
+
+                                        let r = $("#uploadimg img").attr("data");
+                                        if (r) data.field.remark = r;
+                                    }
+
+                                    AJAX.POST(url, data.field, function (d) {
+                                        if (d.code == 1) {
+                                            layer.closeAll();
+                                            layer.msg("保存成功!", {icon: 1})
+                                            //执行重载
+                                            Comm.treeGrid.reload('treeTable', {});
+                                        } else {
+                                            // layer.msg(d.msg, {icon: 5});
+                                            Comm.msg(d.msg, 5)
+                                        }
+                                    })
+                                });
+                                $("#closeform").click(function () {
+                                    layer.closeAll();
+                                })
+                            },
+                        });
+                    })
+                })
+            }
+        });
+    }
+
+    function initUpload() {
+        //初始化上传控件
+        Comm.upload.render({
+            elem: '#btnimg', //绑定元素
+            field: 'file',
+            accept: 'images',
+            acceptMime: 'image/jpg,image/png,image/JPEG',
+            multiple: false, //单图
+            url: config.ossroot,
+            before: function (obj, o) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                //上传loading
+                layer.load();
+            },
+            done: function (d) {
+                layer.closeAll('loading'); //关闭loading
+                top.Comm.OSS.inithtml(this.data, function (html) {
+                    $('#uploadimg').html(html);
+                })
+            },
+            error: function () {
+                //请求异常回调
+                layer.closeAll('loading'); //关闭loading
+            }
+        });
+    }
+
+    /**
+     * 判断父类是否被禁用
+     * 无论多少级，只要有一个父级被禁用都为false
+     *
+     * true:启用 false：禁用
+     */
+    function pisEnable(dictId) {
+        let p = GDict.getItem(dictId);
+        // 防止由于缓存导致这里报错，从而造成数据错误，所以这里如果为空就加载一次
+        if (!p) {
+            GDict.load();
+            p = GDict.getItem(dictId);
+            if (!p) return true;
+        }
+
+        if (p.dictpid <= 0) return true;
+
+        if (p.enable != 1) return false;
+
+        if (p.dictpid > 0)
+            return pisEnable(p.dictpid)
+    }
+
+    /**
+     * 获取当前选中操作的父节点的 code
+     *
+     * @param pid
+     */
+    function getIsUpload(pid) {
+        return toUploadCode.indexOf(getPcode(pid)) !== -1;
+
+        /**
+         * 获取父节点的code （pid=0 的那个）
+         * @param pid
+         * @returns {*}
+         */
+        function getPcode(pid) {
+            if (pid > 0) {
+                let dicto = GDict.getItem(pid);
+                if (!dicto) return null;
+
+                if (dicto.dictpid === 0) {
+                    return dicto.dictcode;
+                } else {
+                    return getPcode(dicto.dictpid);
+                }
+            } else {
+                // return GDict.getItem(d.dictId).dictcode;
+                return null;
+            }
+        }
+    }
+
+</script>
+
+</html>

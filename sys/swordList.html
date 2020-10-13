@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="Generator" content="xnr®">
+    <meta name="Author" content="xxxx-xxx@xx.xx">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <title>分店列表</title>
+    <link rel="stylesheet" href="../inc/layui/css/layui.css">
+    <link rel="stylesheet" href="../css/comm.css">
+    <style>
+        .tabBtn {
+            background-color: #FFF;
+            border: 1px solid #DB0007;
+            color: #DB0007;
+        }
+
+        .tabBtn:hover {
+            border: 1px solid #DB0007;
+            background-color: #DB0007;
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+
+<body>
+<div class="">
+    <div class="">
+        <div class="bg_white pad20">
+            <div class="layui-form" id="search-form">
+                <div class="flex">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="width: auto">敏感词</label>
+                        <div class="layui-input-block">
+                            <input class="layui-input " name="searchMeassage" id="searchMessage"
+                                   autocomplete="off" placeholder="输入敏感词" lay-verify="required">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-danger fl marl20" onclick="findSword()">&nbsp;&nbsp;查询&nbsp;&nbsp;</button>
+                        <button class="layui-btn layui-btn-danger fl marl20" onclick="delect()">&nbsp;&nbsp;删除&nbsp;&nbsp;
+                        </button>
+                        <button class="layui-btn layui-btn-danger fl marl20" onclick="addSword()">
+                            &nbsp;&nbsp;增加&nbsp;&nbsp;
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <table class="layui-hide" id="table" lay-filter="table"></table>
+        </div>
+    </div>
+</div>
+
+</body>
+
+<script type="text/html" id="addSword">
+    <div id="form" class="layui-form" style="margin-top: 20px;margin-right:30px;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">敏感词</label>
+            <div class="layui-input-inline">
+                <input value="{{}}" type="text" id="swordnew" name="swordnew" lay-verify="required" autocomplete="off"
+                       placeholder="请输入敏感词" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align: center">
+            <div class="layui-inline">
+                <button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="sub2">保存</button>
+                <button class="layui-btn layui-btn-primary" id="closeform">取消</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-sm layui-btn-primary marb5 colorred borderred tabBtn" lay-event="update">&nbsp;&nbsp;修改&nbsp;&nbsp;</a>
+</script>
+<script type="text/javascript" src="../inc/layui/layui.js"></script>
+<script type="text/javascript" src="../inc/g.js"></script>
+<script type="text/javascript">
+    function addSword() {
+        Comm.laytpl($("#addSword").html()).render({}, function (html) {
+            layer.open({
+                type: 1,
+                title: '新增敏感词',
+                area: ['400px', '180px'],
+                maxmin: true,
+                content: html,
+                success: function (layero) {
+                    //验证必填项
+                    Comm.form.verify();
+                    Comm.form.render();
+                    //提交表单
+                    Comm.form.on('submit(sub2)', function () {
+                        var sword = $('#swordnew').val()
+                        AJAX.POST('/admin/sword/addSword', {
+                            sword
+                        }, function (d) {
+                            if (d.code == 1) {
+                                layer.closeAll();
+                                layer.msg("添加成功!", {
+                                    icon: 1
+                                })
+                                Comm.table.reload('table');
+                            } else {
+                                layer.msg(d.msg, {
+                                    icon: 5
+                                })
+                                Comm.table.reload('table');
+                            }
+                        })
+                    });
+                    $("#closeform").click(function () {
+                        layer.closeAll();
+                        Comm.table.reload('table');
+                    })
+                }
+            });
+        })
+    }
+
+    function findSword() {
+        var searchMessage = $('#searchMessage').val()
+        pageload(searchMessage)
+    }
+
+    function delect() {
+        var d = Comm.table.checkStatus('table'); //获取选中的数据
+        if (d.data.length <= 0) {
+            Comm.msg("请至少选择一条数据", 5)
+            return;
+        }
+        Comm.confirm('确定选择删除数据', function () {
+            var ids = [];
+            for (var i = 0; i < d.data.length; i++) {
+                ids.push(d.data[i].swordid)
+            }
+            //执行 ajax del 操作
+            AJAX.POST("/admin/sword/deleteSword", {
+                swordIds: ids.join(',')
+            }, function (d) {
+                if (d.code == 1) {
+                    //刷新列表
+                    Comm.table.reload('table');
+                    Comm.msg("删除成功", 1)
+                } else {
+                    Comm.msg(d.msg, 5)
+                }
+            })
+        })
+    }
+
+    function pageload(searchMessage) {
+        //初始化列表
+        Comm.table.render({
+            elem: '#table',
+            url: '/admin/sword/getSwordList', //列表请求接口
+            skin: 'nob',
+            where: { //接口参数
+                searchMessage
+            },
+            cols: [
+                [
+                    //是否可选
+                    {
+                        checkbox: true
+                    },
+                    {
+                        field: 'sword',
+                        title: '敏感词内容'
+                    },
+                    {
+                        field: "",
+                        title: "操作",
+                        toolbar: "#barDemo",
+                        width: 160
+                    }
+                ]
+            ],
+            limit: 20, //分页大小
+            limits: [10, 20, 30, 40, 50, 60, 70, 80, 90],
+            id: 'table',
+            page: true, //是否分页
+        });
+
+        Comm.table.on('tool(table)', function (obj) {
+            if (obj.event == 'update') { //修改敏感词
+                layer.prompt({
+                    formType: 2,
+                    value: obj.data.sword,
+                    title: '修改敏感词',
+                    area: ['350px', '180px'], //自定义文本域宽高
+                    btnAlign: 'c'
+                }, function (value) {
+                    AJAX.POST('/admin/sword/updateSword', {swordId: obj.data.swordid, sword: value}, function (d) {
+                        if (d.code == 1) {
+                            layer.closeAll();
+                            layer.msg("修改成功!", {
+                                icon: 1
+                            })
+                            Comm.table.reload('table');
+                        } else {
+                            layer.msg(d.msg, {
+                                icon: 5
+                            })
+                        }
+                    })
+                });
+                layer.close(index);
+            }
+        });
+    }
+</script>
+
+</html>

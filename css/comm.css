@@ -1,0 +1,721 @@
+body {
+    background-color: #f2f2f2;
+    padding: 20px;
+}
+
+.colorred {
+    color: #DB0007;
+}
+
+.colord2 {
+    color: #d2d2d2;
+}
+
+.color444 {
+    color: #444444;
+}
+
+.colorFFB800 {
+    color: #FFB800;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+/*字体颜色*/
+.col_title {
+    color: #222222;
+}
+
+.col_sub {
+    color: gray !important;
+}
+
+.col_gray {
+    color: gray;
+}
+
+.col_lgray {
+    color: #ABABAB;
+}
+
+.col_light {
+    color: #f3f3f3;
+}
+
+.col_white {
+    color: #fff !important;
+}
+
+.col_green {
+    color: #3DBB65;
+}
+
+.col_orange {
+    color: #FFCA05;
+}
+
+.col_red {
+    color: #E30008 !important;
+}
+
+.col_blue {
+    color: #1D8DF6;
+}
+
+
+.col_underline {
+    color: #E4E4E4;
+}
+
+
+.col_pr {
+    color: #FD7F23;
+}
+
+.col_theme {
+    color: #F7775F;
+}
+
+/*↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑*/
+/*↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑*/
+.bg_gray {
+    background-color: #8F8F8F;
+}
+
+.bg_subLg {
+    background-color: #EBEBEB;
+}
+
+.bg_underline {
+    color: #E4E4E4;
+}
+
+.bg_lgray {
+    background-color: #F6F6F6;
+}
+
+.bg_disable {
+    background-color: #E4E4E4;
+}
+
+.bg_green {
+    background-color: #BEF082;
+}
+
+.bg_orange {
+    background-color: #FF551E;
+}
+
+.bg_white {
+    background-color: white !important;
+}
+
+.bg_yellow {
+    background-color: yellow;
+}
+
+.bg_white {
+    background: #ffffff
+}
+
+.bg_theme {
+    background-color: #F7775F !important;
+}
+
+.marb0 {
+    margin-bottom: 0px;
+}
+
+.marb5 {
+    margin-bottom: 5px;
+}
+
+.marb10 {
+    margin-bottom: 10px;
+}
+
+.marb15 {
+    margin-bottom: 15px;
+}
+
+.marb20 {
+    margin-bottom: 20px;
+}
+
+.marb25 {
+    margin-bottom: 25px;
+}
+
+.marb30 {
+    margin-bottom: 30px;
+}
+
+.mart5 {
+    margin-top: 5px;
+}
+
+.mart10 {
+    margin-top: 10px;
+}
+
+.mart15 {
+    margin-top: 15px;
+}
+
+.mart20 {
+    margin-top: 20px;
+}
+
+.mart25 {
+    margin-top: 25px;
+}
+
+.mart30 {
+    margin-top: 30px;
+}
+
+.marl5 {
+    margin-left: 5px;
+}
+
+.marl10 {
+    margin-left: 10px;
+}
+
+.marl15 {
+    margin-left: 15px;
+}
+
+.marl20 {
+    margin-left: 20px;
+}
+
+.marl25 {
+    margin-left: 25px;
+}
+
+.marl30 {
+    margin-left: 30px;
+}
+
+.marr5 {
+    margin-right: 5px;
+}
+
+.marr10 {
+    margin-right: 10px;
+}
+
+.marr15 {
+    margin-right: 15px;
+}
+
+.marr20 {
+    margin-right: 20px;
+}
+
+.marr25 {
+    margin-right: 25px;
+}
+
+.marr30 {
+    margin-right: 30px;
+}
+
+.paddb5 {
+    padding-bottom: 5px;
+}
+
+.paddb10 {
+    padding-bottom: 10px;
+}
+
+.paddb15 {
+    padding-bottom: 15px;
+}
+
+.paddb20 {
+    padding-bottom: 20px;
+}
+
+.paddb25 {
+    padding-bottom: 25px;
+}
+
+.paddb30 {
+    padding-bottom: 30px;
+}
+
+.paddt5 {
+    padding-top: 5px;
+}
+
+.paddt10 {
+    padding-top: 10px;
+}
+
+.paddt15 {
+    padding-top: 15px;
+}
+
+.paddt20 {
+    padding-top: 20px;
+}
+
+.paddt25 {
+    padding-top: 25px;
+}
+
+.paddt30 {
+    padding-top: 30px;
+}
+
+.paddl5 {
+    padding-left: 5px;
+}
+
+.paddl10 {
+    padding-left: 10px;
+}
+
+.paddl15 {
+    padding-left: 15px;
+}
+
+.paddl20 {
+    padding-left: 20px;
+}
+
+.paddl25 {
+    padding-left: 25px;
+}
+
+.paddl30 {
+    padding-left: 30px;
+}
+
+.paddr5 {
+    padding-right: 5px;
+}
+
+.paddr10 {
+    padding-right: 10px;
+}
+
+.paddr15 {
+    padding-right: 15px;
+}
+
+.paddr20 {
+    padding-right: 20px;
+}
+
+.paddr25 {
+    padding-right: 25px;
+}
+
+.paddr30 {
+    padding-right: 30px;
+}
+
+.pad0 {
+    padding: 0;
+}
+
+.pad5 {
+    padding: 5px;
+}
+
+.pad10 {
+    padding: 10px;
+}
+
+.pad15 {
+    padding: 15px;
+}
+
+.pad20 {
+    padding: 20px;
+}
+
+.pad30 {
+    padding: 30px;
+}
+
+.marg5 {
+    margin: 5px;
+}
+
+.marg10 {
+    margin: 10px;
+}
+
+.marg15 {
+    margin: 15px;
+}
+
+.marg20 {
+    margin: 20px;
+}
+
+.fl {
+    float: left;
+}
+
+.fr {
+    float: right;
+}
+
+.f12 {
+    font-size: 12px;
+}
+
+.f14 {
+    font-size: 14px;
+}
+
+.f16 {
+    font-size: 16px;
+}
+
+.f18 {
+    font-size: 18px;
+}
+
+.f20 {
+    font-size: 20px;
+}
+
+.f22 {
+    font-size: 22px;
+}
+
+.f24 {
+    font-size: 24px;
+}
+
+.f28 {
+    font-size: 28px;
+}
+
+.f30 {
+    font-size: 30px;
+}
+
+.f36 {
+    font-size: 36px;
+}
+
+.h20 {
+    height: 20px;
+}
+
+.h30 {
+    height: 30px;
+}
+
+.h50 {
+    height: 50px;
+}
+
+.lh20 {
+    line-height: 20px;
+}
+
+.lh25 {
+    line-height: 25px;
+}
+
+.lh30 {
+    line-height: 30px;
+}
+
+.lh38 {
+    line-height: 38px;
+}
+
+.lh40 {
+    line-height: 40px;
+}
+
+.lh45 {
+    line-height: 45px;
+}
+
+.lh50 {
+    line-height: 50px;
+}
+
+.lh70 {
+    line-height: 70px;
+}
+
+.tright {
+    text-align: right;
+}
+
+.tleft {
+    text-align: left;
+}
+
+.center {
+    text-align: center;
+}
+
+.line-through {
+    text-decoration: line-through;
+}
+
+.hide {
+    display: none;
+}
+
+.borderb {
+    border-bottom: 1px solid #F2F2F2;
+}
+
+.borderred {
+    border: 1px solid #DB0007;
+}
+
+.ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    white-space: nowrap;
+    -webkit-box-orient: vertical;
+}
+
+.cursor {
+    cursor: pointer;
+}
+
+
+/*去浮动*/
+
+.clearfix::before,
+.clearfix::after {
+    content: "";
+    height: 0;
+    line-height: 0;
+    display: block;
+    visibility: hidden;
+    clear: both;
+}
+
+a:hover {
+    color: initial;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+    /* WebKit browsers */
+    color: #BDBDBD;
+}
+
+input:-moz-placeholder,
+textarea:-moz-placeholder {
+    /* Mozilla Firefox 4 to 18 */
+    color: #BDBDBD;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+    /* Mozilla Firefox 19+ */
+    color: #BDBDBD;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+    /* Internet Explorer 10+ */
+    color: #BDBDBD;
+}
+
+textarea {
+    resize: none;
+}
+
+.layui-tab-title li .layui-tab-close:hover {
+    background-color: #239CDE;
+}
+
+.layui-table-view .layui-table td,
+.layui-table-view .layui-table th {
+    padding: 10px 0px;
+}
+
+.layui-table-cell {
+    height: auto;
+}
+
+.layui-btn {
+    border-radius: 5px;
+}
+
+.layui-btn-danger {
+    background-color: #DB0007;
+}
+
+.layui-tab-brief>.layui-tab-title .layui-this {
+    color: #DB0007;
+}
+
+.layui-tab-brief>.layui-tab-more li.layui-this:after,
+.layui-tab-brief>.layui-tab-title .layui-this:after {
+    border-color: #DB0007;
+}
+
+/****************************{flex}*****************************/
+
+.flex_wrap {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+
+.layui-table-box {
+    text-align: center;
+}
+
+.layui-table-cell {
+    text-align: center;
+}
+
+.flex_start {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.flex_between {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex_around {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.flex_center {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.flex {
+    display: flex;
+}
+
+.flexItem_between {
+    justify-content: space-between;
+}
+
+.flexItem_v {
+    flex-direction: column;
+}
+
+.flexItem_h {
+    flex-direction: row;
+}
+
+.flexItem_wrap {
+    flex-wrap: wrap;
+}
+
+.flexItem_nowrap {
+    flex-wrap: nowrap;
+}
+
+.flex_item_center {
+    align-items: center;
+}
+
+.flex1 {
+    flex: 1;
+    /*flex-grow: 1;*/
+}
+
+
+/** 分页样式 **/
+/*.layui-laypage-default {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.layui-laypage .layui-laypage-skip,
+.layui-laypage .layui-laypage-count,
+.layui-laypage .layui-laypage-limits {
+    display: none;
+}
+
+.layui-laypage .layui-laypage-curr .layui-laypage-em {
+    background-color: #DB0007;
+    border: #DB0007 0px solid;
+}
+
+.layui-table-page .layui-laypage a,
+.layui-table-page .layui-laypage span.layui-laypage-curr{
+    border: #E6E6E6 1px solid;
+    width: 65px;
+    height: 35px;
+    text-align: center;
+    line-height: 35px;
+    padding: 0px;
+    margin: 0px 6px;
+    border-radius: 3px;
+}
+.layui-table-page .layui-laypage a:hover{
+    color:#DB0007;
+}
+
+.layui-table-page {
+    padding-top: 25px;
+    padding-bottom: 60px;
+}
+
+.layui-disabled,
+.layui-disabled:hover {
+    background-color: #E6E6E6 !important;
+}*/
+
+/*********************************************************/
+.topBorder {
+    border-top: 0.3px solid #E3E3E3;
+}
+
+.rightBorder {
+    border-right: 0.3px solid #E3E3E3;
+}
+
+.leftBorder {
+    border-left: 0.3px solid #E3E3E3;
+}
+
+.bottomBorder {
+    border-bottom: 1px solid #E4E4E4;
+}
+
+/*********************************************************/
+.tabBtn {
+    background-color: #FFF;
+    border: 1px solid #DB0007;
+    color: #DB0007;
+}
+
+.tabBtn:hover {
+    background-color: #DB0007;
+}

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="Generator" content="xnr®">
+    <meta name="Author" content="xxxx-xxx@xx.xx">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <title>系统配置</title>
+    <link rel="stylesheet" href="../inc/layui/css/layui.css">
+    <link rel="stylesheet" href="../css/comm.css">
+</head>
+
+<body>
+<div class="layui-form" id="search-form">
+    <div class="layui-form-item">
+
+    </div>
+</div>
+<table class="layui-hide" id="table" lay-filter="table"></table>
+</body>
+
+<script type="text/html" id="toolbarDemo">
+    <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="edit" data-type="edit">编辑</button>
+    {{# if (Comm.db('isgod')) { }}
+    <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="add" data-type="add">新增</button>
+    <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="del" data-type="del">删除</button>
+    {{# } }}
+</script>
+<script type="text/html" id="formTpl">
+    <div id="form" class="layui-form" style="margin-top: 20px;margin-right:30px;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">配置名称</label>
+            <div class="layui-input-block">
+                {{# if(d.syskey){ }}
+                <input readonly value="{{d.syskey?d.syskey:''}}" type="text" name="syskey" lay-verify="required"
+                       autocomplete="off" placeholder="请输入配置名称" class="layui-input"/>
+                {{# } else { }}
+                <input value="{{d.syskey?d.syskey:''}}" type="text" name="syskey" lay-verify="required"
+                       autocomplete="off" placeholder="请输入配置名称" class="layui-input"/>
+                {{# } }}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">配置值</label>
+            <div class="layui-input-block">
+                <textarea name="sysvalue" id="sysvalue" lay-verify="required" autocomplete="off" placeholder="请输入配置值"
+                          class="layui-textarea">{{d.sysvalue?d.sysvalue:''}}</textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">描述</label>
+            <div class="layui-input-block">
+                <textarea name="ds" id="ds" autocomplete="off" placeholder="请输入描述" class="layui-textarea">{{d.ds?d.ds:''}}</textarea>
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align: center">
+            <div class="layui-inline">
+                <button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="sub">保存</button>
+                <button class="layui-btn layui-btn-primary" id="closeform">关闭</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript" src="../inc/g.js"></script>
+<script type="text/javascript" src="../inc/layui/layui.js"></script>
+<script type="text/javascript">
+
+    // 定义不可见的配置 key
+    let notShow = [
+        'commission_five',
+        'commission_four',
+        'commission_one',
+        'commission_three',
+        'commission_two',
+        'level_five',
+        'level_four',
+        'level_one',
+        'level_three',
+        'level_two',
+        'map_ak',
+        'map_sk',
+        'p1',
+        'p2',
+        'p3',
+        'p4',
+        'p5',
+        'p6',
+        'partner_subsidy_five',
+        'partner_subsidy_four',
+        'partner_subsidy_one',
+        'partner_subsidy_three',
+        'partner_subsidy_two',
+        'tianfupay_key',
+        'tianfupay_partner',
+        'tianfupay_subpartner',
+        'maincompany_commission',
+        'main_money',
+        'customer_recommend_scale',
+        'store_commission',
+        'customer_money',
+        'cycle',
+        'settlement_ratio',
+        'cycle_value'
+    ];
+
+    function pageload() {
+        //方法级渲染
+        Comm.table.render({
+            elem: '#table',
+            url: '/admin/sysconfig/getlist',
+            toolbar: '#toolbarDemo',
+            defaultToolbar: [],
+            cols: [[
+                // { checkbox: true },
+                {type: 'radio', align: 'center', width: 80},
+                {field: 'syskey', title: '配置名称',},
+                {field: 'sysvalue', title: '配置值',},
+                {field: 'ds', title: '描述',}
+            ]],
+            limit: 30,
+            id: 'table',
+            height: 'full-' + ($(".layui-form").height() - 50),
+            parseData: res => {
+                if (!Comm.db('isgod')) {
+                    let tdata = {};
+                    for (let k in res.data) {
+                        // 如果定义为可见的配置，那么这里改为 >= 0 即可
+                        if (notShow.indexOf(k) < 0) {
+                            tdata[k] = res.data[k];
+                        }
+                    }
+                    res.data = tdata;
+                    return res;
+                }
+            }
+        });
+
+        var active = {
+            add: function () {
+                save(null)
+            },
+            edit: function () {
+                var d = Comm.table.checkStatus('table');//获取选中的数据
+                if (d.data.length != 1) {
+                    Comm.msg("请选择一条数据", 5)
+                    return;
+                }
+                save(d.data[0])
+            },
+            del: function () {
+                var d = Comm.table.checkStatus('table');//获取选中的数据
+                if (d.data.length <= 0) {
+                    Comm.msg("请选择一条数据", 5)
+                    return;
+                }
+                Comm.confirm('确定选择删除数据', function () {
+                    var ids = [];
+                    for (var i = 0; i < d.data.length; i++) {
+                        ids.push(d.data[i].syskey)
+                    }
+                    //执行 ajax del 操作
+                    AJAX.POST("/admin/sysConfig/delete", {syskey: ids.join(',')}, function (d) {
+                        if (d.code == 1) {
+                            //刷新列表
+                            Comm.table.reload('table');
+                            Comm.msg("删除成功", 1)
+                        } else {
+                            Comm.msg(d.msg, 5)
+                        }
+                    })
+                })
+            }
+        };
+
+        //编辑按钮
+        // $('#table .layui-btn').on('click', function () {
+        //     var type = $(this).data('type');
+        //     active[type] ? active[type].call(this) : '';
+        // });
+
+        Comm.table.on('toolbar(table)', function (obj) {
+            active[obj.event] ? active[obj.event].call(this) : '';
+        });
+
+        function save(d) {
+            var title = "新增系统配置", url = "/admin/sysConfig/add"
+            if (d != null) {
+                title = "修改系统配置", url = "/admin/sysConfig/updateSys"
+            } else {
+                d = {};
+            }
+            Comm.laytpl($("#formTpl").html()).render(d, function (html) {
+                //多窗口模式，层叠置顶
+                layer.open({
+                    type: 1,
+                    title: title,
+                    area: ['600px', '420px'],
+                    maxmin: true,
+                    content: html,
+                    success: function (layero) {
+                        Comm.form.verify();
+                        //监听指定开关
+                        Comm.form.on('submit(sub)', function (data) {
+                            data.field.keybak = d.syskey;
+                            AJAX.POST(url, data.field, function (d) {
+                                if (d.code == 1) {
+                                    layer.closeAll();
+                                    layer.msg("保存成功!", {icon: 1})
+                                    //执行重载
+                                    Comm.table.reload('table');
+                                } else {
+                                    layer.msg(d.msg, {icon: 5})
+                                }
+                            })
+                        });
+                        $("#closeform").click(function () {
+                            layer.closeAll();
+                        })
+                    },
+                });
+            })
+        }
+    }
+</script>
+
+</html>

@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="Generator" content="xnr®">
+    <meta name="Author" content="xxxx-xxx@xx.xx">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <title>个人空间</title>
+    <link rel="stylesheet" href="../inc/layui/css/layui.css">
+    <link rel="stylesheet" href="../inc/layui/lay/dtree/dtree.css">
+    <link rel="stylesheet" href="../inc/layui/lay/dtree/font/iconfont.css">
+</head>
+
+<body class="layui-layout-body">
+    <div class="layui-layout">
+        <div class="layui-side" style="background-color: #f2f2f2;">
+            <ul id="dTree" class="dtree" data-id="0"></ul>
+        </div>
+        <div class="layui-body">
+            <!-- 内容主体区域 -->
+            <blockquote class="layui-elem-quote">
+                内容主体区域。
+            </blockquote>
+        </div>
+    </div>
+</body>
+<script type="text/html" id="formTpl">
+</script>
+<script type="text/javascript" src="../inc/layui/layui.js"></script>
+<script type="text/javascript" src="../inc/g.js"></script>
+<script type="text/javascript" src="../inc/area.js"></script>
+<script type="text/javascript">
+    //加载页面
+    function pageload() {
+
+        //引用加载省市区
+        layui.extend({
+            dtree: '../../inc/layui/lay/dtree/dtreescc'
+        })
+        layui.use(['dtree'], function () {
+
+            var toolbarFun = {
+                addTreeNode: function (treeNode) { //添加树节点后调用的函数，用于用户自定义，如未指定则树不会发生变化
+                    console.log(treeNode);
+                    return treeNode.nodeId; // 返回ID值,或一个JSON对象
+                },
+                editTreeNode: function (treeNode) { //编辑树节点后调用的函数，用于用户自定义，如未指定则树不会发生变化
+                    console.log(treeNode);
+                    return true;
+                },
+                editTreeLoad: function (treeNode) { //编辑树的数据回显，用于打开编辑时，回填数据，用于用户自定义。
+                    console.log(treeNode);
+                    return treeNode;
+                },
+                delTreeNode: function (treeNode) { //删除树后调用的函数，用于用户自定义，如未指定则树不会发生变化
+                    console.log(treeNode);
+                    return true;
+                },
+            };
+
+            Comm.dtree = layui.dtree;
+            Comm.dtree.render({
+                elem: "#dTree",  //绑定元素
+                method: 'GET',
+                dataStyle: 'layuiStyle',
+                url: "../inc/layui/lay/dtree/dtreescc.json",  //异步接口
+                checkbar: true,//开启checkbox多选
+                menubar: true,//开启头部菜单
+                menubarFun: {
+                    remove: function (checkbarNodes) { // 必须将该方法实现了，节点才会真正的从后台删除哦
+                        return true;
+                    }
+                },
+                toolbar: true,//开启右键
+                toolbarFun: toolbarFun,
+            });
+            // 点击节点触发回调
+            Comm.dtree.on("node('dTree')", function (param) {
+                Comm.msg(JSON.stringify(param));
+            });
+        })
+    }
+</script>
+
+</html>

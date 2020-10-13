@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="Generator" content="xnr®">
+    <meta name="Author" content="xxxx-xxx@xx.xx">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <title>视频上传demo</title>
+    <link rel="stylesheet" href="../inc/layui/css/layui.css">
+    <link rel="stylesheet" href="../css/comm.css"/>
+    <link rel="stylesheet" href="https://g.alicdn.com/de/prismplayer/2.8.2/skins/default/aliplayer-min.css"/>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .leftwidth {
+            padding: 9px 40px
+        }
+
+        .upload-box {
+            position: relative;
+            padding: 25px;
+            width: 400px;
+            height: 150px;
+            border: 1px solid salmon;
+            margin: 0 auto;
+        }
+
+        /* input的按钮样式 */
+        .original-upload {
+            position: absolute;
+            top: 7px;
+            left: 40px;
+            width: 93px;
+            height: 42px;
+            opacity: 0;
+            z-index: 3;
+            cursor: pointer;
+        }
+
+        /* 假按钮样式，自己发挥 */
+        .fake-uploadbtn {
+            display: block;
+            width: 134px;
+            line-height: 42px;
+            background-color: #ADD8E6;
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 12px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="form" class="layui-form" style="margin-top: 20px;width: 80%;">
+    <input type="hidden" name="videoid" id="videoid"/>
+    <input type="hidden" name="alivideoid" id="alivideoid"/>
+    <div class="layui-form-item">
+        <div class="layui-col-xs6 ">
+            <div class="upload leftwidth">
+                <div>
+                    <input type="file" id="fileUpload" class="original-upload"/>
+                    <a href="javascript:;" class="layui-btn">上传视频</a>
+                    <label class="status">上传状态: <span id="status"></span></label>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-col-xs8">
+            <div class=" upload-type leftwidth">
+                <button class="layui-btn layui-btn-disabled" id="authUpload">开始上传</button>
+                <button class="layui-btn layui-btn-disabled" id="pauseUpload">暂停</button>
+                <button class="layui-btn layui-btn-disabled" id="resumeUpload">恢复上传</button>
+                <span class="progress">上传进度: <i id="auth-progress">0</i> %</span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-col-xs4">
+            <label class="layui-form-label">视频预览</label>
+        </div>
+    </div>
+
+    <div class="layui-form-item leftwidth">
+
+        <div class="prism-player" id="J_prismPlayer"></div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../inc/g.js"></script>
+<script type="text/javascript" src="../inc/layui/layui.js"></script>
+<script type="text/javascript" src="../inc/aliyun-upload/lib/es6-promise.min.js"></script>
+<script type="text/javascript" src="../inc/aliyun-upload/lib/aliyun-oss-sdk-5.3.1.min.js"></script>
+<script type="text/javascript" src="../inc/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="../inc/aliyun-upload/aliyun-upload-sdk-1.5.0.min.js"></script>
+<script type="text/javascript" src="https://g.alicdn.com/de/prismplayer/2.8.2/aliplayer-min.js"></script>
+
+<script type="text/javascript">
+
+    var videoid = Comm.query("videoid");
+    var alivideoid = Comm.query("alivideoid");
+    var userId = '1862113382065362';
+    var accessKeyId = 'LTAIWmgp1U5AQxnw';
+    var accessKeySecret = '3xA56nnYtCFL2CU0arTQwSV2qMxpea';
+
+
+    //加载页面
+    function pageload() {
+
+        //播放器
+        var player = new Aliplayer({
+            id: 'J_prismPlayer',
+            width: '50%',
+            autoplay: false,
+            //支持播放地址播放,此播放优先级最高
+            // source : '播放url',
+            // //播放方式二：点播用户推荐
+            // vid : 'bd77fe5e1b614613a241816e2db96b28',
+            // playauth : 'ddd',
+            // cover: 'http://liveroom-img.oss-cn-qingdao.aliyuncs.com/logo.png',
+            // //播放方式三：仅MPS用户使用
+            // vid : '1e067a2831b641db90d570b6480fbc40',
+            // accId: 'dd',
+            // accSecret: 'dd',
+            // stsToken: 'dd',
+            // domainRegion: 'dd',
+            // authInfo: 'dd',
+            //播放方式四：使用STS方式播放
+            vid: alivideoid,
+            accessKeyId: accessKeyId,
+            // securityToken: 'dd',
+            accessKeySecret: accessKeySecret,
+            region: 'cn-shanghai',//eu-central-1,ap-southeast-1
+        }, function (player) {
+            console.log(player)
+            console.log('播放器创建好了。')
+        })
+    }
+
+    if (!FileReader.prototype.readAsBinaryString) {
+        FileReader.prototype.readAsBinaryString = function (fileData) {
+            var binary = "";
+            var pt = this;
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var bytes = new Uint8Array(reader.result);
+                var length = bytes.byteLength;
+                for (var i = 0; i < length; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                //pt.result  - readonly so assign binary
+                pt.content = binary;
+                pt.onload()
+            }
+            reader.readAsArrayBuffer(fileData);
+        }
+    }
+    $(document).ready(function () {
+        function createUploader() {
+            var uploader = new AliyunUpload.Vod({
+                timeout: 60000,
+                partSize: 1048576,
+                parallel: 5,
+                retryCount: 3,
+                retryDuration: 2,
+                region: "cn-shanghai",
+                userId: userId,
+                // 添加文件成功
+                addFileSuccess: function (uploadInfo) {
+                    console.log('addFileSuccess')
+                    $('#authUpload').removeClass("layui-btn-disabled")
+                    $('#resumeUpload').removeClass("layui-btn-disabled")
+                    $('#status').text('添加文件成功, 等待上传...')
+                    console.log("addFileSuccess: " + uploadInfo.file.name)
+                },
+                // 开始上传
+                onUploadstarted: function (uploadInfo) {
+                    // 如果是 UploadAuth 上传方式, 需要调用 uploader.setUploadAuthAndAddress 方法
+                    // 如果是 UploadAuth 上传方式, 需要根据 uploadInfo.videoId是否有值，调用点播的不同接口获取uploadauth和uploadAddress
+                    // 如果 uploadInfo.videoId 有值，调用刷新视频上传凭证接口，否则调用创建视频上传凭证接口
+                    // 注意: 这里是测试 demo 所以直接调用了获取 UploadAuth 的测试接口, 用户在使用时需要判断 uploadInfo.videoId 存在与否从而调用 openApi
+                    // 如果 uploadInfo.videoId 存在, 调用 刷新视频上传凭证接口(https://help.aliyun.com/document_detail/55408.html)
+                    // 如果 uploadInfo.videoId 不存在,调用 获取视频上传地址和凭证接口(https://help.aliyun.com/document_detail/55407.html)
+                    if (!uploadInfo.videoId) {
+//              var createUrl = 'https://demo-vod.cn-shanghai.aliyuncs.com/voddemo/CreateUploadVideo?Title=testvod1&FileName=aa.mp4&BusinessType=vodai&TerminalType=pc&DeviceModel=iPhone9,2&UUID=59ECA-4193-4695-94DD-7E1247288&AppVersion=1.0.0&VideoId=5bfcc7864fc14b96972842172207c9e6'
+                        var createUrl = config.root + '/common/vod/videoUpload?title=' + uploadInfo.file.name + '&filename=' + uploadInfo.file.name
+                        $.get(createUrl, function (res) {
+                            console.log(res.data)
+                            var uploadAuth = res.data.uploadAuth;
+                            var uploadAddress = res.data.uploadAddress;
+                            var videoId = res.data.videoId;
+                            alivideoid = videoId;
+                            uploader.setUploadAuthAndAddress(uploadInfo, uploadAuth, uploadAddress, videoId)
+                        }, 'json')
+                        $('#status').text('文件开始上传...')
+                        console.log("onUploadStarted:" + uploadInfo.file.name + ", endpoint:" + uploadInfo.endpoint + ", bucket:" + uploadInfo.bucket + ", object:" + uploadInfo.object)
+                    } else {
+                        // 如果videoId有值，根据videoId刷新上传凭证
+                        // https://help.aliyun.com/document_detail/55408.html?spm=a2c4g.11186623.6.630.BoYYcY
+                        // var refreshUrl = 'https://demo-vod.cn-shanghai.aliyuncs.com/voddemo/RefreshUploadVideo?BusinessType=vodai&TerminalType=pc&DeviceModel=iPhone9,2&UUID=59ECA-4193-4695-94DD-7E1247288&AppVersion=1.0.0&Title=haha1&FileName=xxx.mp4&VideoId=' + uploadInfo.videoId
+                        var refreshUrl = config.root + '/common/vod/refreshUploadVideo?alivideoid=' + alivideoid
+                        $.get(refreshUrl, function (res) {
+                            var uploadAuth = res.data.uploadAuth;
+                            var uploadAddress = res.data.uploadAddress;
+                            var videoId = res.data.videoId;
+                            alivideoid = videoId;
+                            uploader.setUploadAuthAndAddress(uploadInfo, uploadAuth, uploadAddress, videoId)
+                        }, 'json')
+                    }
+                },
+                // 文件上传成功
+                onUploadSucceed: function (uploadInfo) {
+                    console.log("onUploadSucceed: " + uploadInfo.file.name + ", endpoint:" + uploadInfo.endpoint + ", bucket:" + uploadInfo.bucket + ", object:" + uploadInfo.object)
+                    $('#status').text('文件上传成功!')
+                    //播放器
+                    console.log(alivideoid)
+                    var player = new Aliplayer({
+                        id: 'J_prismPlayer',
+                        width: '50%',
+                        autoplay: false,
+                        //支持播放地址播放,此播放优先级最高
+                        // source : '播放url',
+                        // //播放方式二：点播用户推荐
+                        // vid : 'bd77fe5e1b614613a241816e2db96b28',
+                        // playauth : 'ddd',
+                        // cover: 'http://liveroom-img.oss-cn-qingdao.aliyuncs.com/logo.png',
+                        // //播放方式三：仅MPS用户使用
+                        // vid : '1e067a2831b641db90d570b6480fbc40',
+                        // accId: 'dd',
+                        // accSecret: 'dd',
+                        // stsToken: 'dd',
+                        // domainRegion: 'dd',
+                        // authInfo: 'dd',
+                        //播放方式四：使用STS方式播放
+                        vid: alivideoid,
+                        accessKeyId: accessKeyId,
+                        // securityToken: 'dd',
+                        accessKeySecret: accessKeySecret,
+                        region: 'cn-shanghai',//eu-central-1,ap-southeast-1
+                    }, function (player) {
+                        console.log('播放器创建好了。')
+                    });
+                },
+                // 文件上传失败
+                onUploadFailed: function (uploadInfo, code, message) {
+                    console.log("onUploadFailed: file:" + uploadInfo.file.name + ",code:" + code + ", message:" + message)
+                    $('#status').text('文件上传失败!')
+                },
+                // 取消文件上传
+                onUploadCanceled: function (uploadInfo, code, message) {
+                    console.log("Canceled file: " + uploadInfo.file.name + ", code: " + code + ", message:" + message)
+                    $('#status').text('文件上传已暂停!')
+                },
+                // 文件上传进度，单位：字节, 可以在这个函数中拿到上传进度并显示在页面上
+                onUploadProgress: function (uploadInfo, totalSize, progress) {
+                    console.log("onUploadProgress:file:" + uploadInfo.file.name + ", fileSize:" + totalSize + ", percent:" + Math.ceil(progress * 100) + "%")
+                    var progressPercent = Math.ceil(progress * 100)
+                    $('#auth-progress').text(progressPercent)
+                    $('#status').text('文件上传中...')
+                },
+                // 上传凭证超时
+                onUploadTokenExpired: function (uploadInfo) {
+                    // 上传大文件超时, 如果是上传方式一即根据 UploadAuth 上传时
+                    // 需要根据 uploadInfo.videoId 调用刷新视频上传凭证接口(https://help.aliyun.com/document_detail/55408.html)重新获取 UploadAuth
+                    // 然后调用 resumeUploadWithAuth 方法, 这里是测试接口, 所以我直接获取了 UploadAuth
+                    $('#status').text('文件上传超时!')
+
+                    let refreshUrl = config.root + '/common/vod/refreshUploadVideo?alivideoid=' + alivideoid;
+                    $.get(refreshUrl, function (res) {
+                        var uploadAuth = res.data.uploadAuth;
+                        uploader.resumeUploadWithAuth(uploadAuth)
+                        console.log('upload expired and resume upload with uploadauth ' + uploadAuth)
+                    }, 'json')
+                },
+                // 全部文件上传结束
+                onUploadEnd: function (uploadInfo) {
+                    $('#status').text('文件上传完毕!')
+                    console.log("onUploadEnd: uploaded all the files")
+                }
+            })
+            return uploader
+        }
+
+        var uploader = null
+
+        $('#fileUpload').on('change', function (e) {
+            var file = e.target.files[0]
+            if (!file) {
+                alert("请先选择需要上传的文件!")
+                return
+            }
+            var Title = file.name
+            var userData = '{"Vod":{}}'
+            if (uploader) {
+                uploader.stopUpload()
+                $('#auth-progress').text('0')
+                $('#status').text("")
+            }
+            uploader = createUploader()
+            // 首先调用 uploader.addFile(event.target.files[i], null, null, null, userData)
+            console.log(uploader)
+            uploader.addFile(file, null, null, null, userData)
+            $('#authUpload').removeClass("layui-btn-disabled");
+            $('#pauseUpload').removeClass("layui-btn-disabled");
+            $('#resumeUpload').removeClass("layui-btn-disabled");
+        })
+
+        // 第一种方式 UploadAuth 上传
+        $('#authUpload').on('click', function () {
+            // 然后调用 startUpload 方法, 开始上传
+            if (uploader !== null) {
+                uploader.startUpload()
+
+                $('#authUpload').addClass("layui-btn-disabled");
+                $('#pauseUpload').removeClass("layui-btn-disabled");
+            }
+        })
+
+        // 暂停上传
+        $('#pauseUpload').on('click', function () {
+            if (uploader !== null) {
+                uploader.stopUpload()
+                $('#resumeUpload').removeClass("layui-btn-disabled");
+                $('#pauseUpload').addClass("layui-btn-disabled");
+            }
+        });
+
+
+        $('#resumeUpload').on('click', function () {
+            if (uploader !== null) {
+                uploader.startUpload()
+                $('#resumeUpload').addClass("layui-btn-disabled");
+                $('#pauseUpload').removeClass("layui-btn-disabled");
+            }
+        })
+
+    })
+
+</script>
+
+</html>
