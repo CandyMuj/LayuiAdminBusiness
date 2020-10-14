@@ -1,5 +1,5 @@
 var config = {
-    root: 'http://127.0.0.1/b/',
+    root: 'http://127.0.0.1:9233',
     ueditor: 'http://127.0.0.1/ueditor/',
     ossroot: 'http://xxx.oss-cn-hangzhou.aliyuncs.com/',
     pageSize: 10,
@@ -12,6 +12,8 @@ var AJAX = new function () {
         K = "_token",
         abs = null,
         t = this;
+    const signField = 'sign',
+        signKey = 'SxgKESLGzlw@iH8f';
 
     function finish(v, cb) {
         if (cb == null) return;
@@ -58,16 +60,52 @@ var AJAX = new function () {
 
     function deobj(obj) {
         if (obj == null) return "";
-        var s = [];
-        for (var i in obj) {
+        let s = [];
+        let data = {};
+        for (let i in obj) {
             if (typeof obj[i] == typeof "") {
                 if (obj[i].indexOf("%") > 0) obj[i] = obj[i].replace(/%/g, "%25");
                 if (obj[i].indexOf("&") > 0) obj[i] = obj[i].replace(/\&/g, "%26");
                 if (obj[i].indexOf("+") > 0) obj[i] = obj[i].replace(/\+/g, "%2B");
             }
             s.push(i + "=" + encodeURIComponent(obj[i]));
+            data[i] = encodeURIComponent(obj[i]);
         }
+
+        // 参数数据加密处理
+        // 仅可校验非body参数，因为body参数在后端仅可被读取一次，重复读取将会抛异常，所以无法加密的，而且body还可能是二进制文件，是不方便加密和重复读取的，流的特性只可被读取一次
+        s.push(signField + "=" + generateSignature(data))
+
         return s.join("&");
+    }
+
+    /**
+     * 生成签名
+     *
+     * @param data json格式数据
+     * @returns {string}
+     */
+    function generateSignature(data) {
+        let keyArray = [];
+        $.each(data, key => {
+            keyArray.push(key)
+        })
+
+        keyArray = keyArray.sort();
+        let sb = "";
+        $.each(keyArray, i => {
+            let k = keyArray[i];
+            if (k === signField) {
+                return true;
+            }
+            let val = data[k];
+            if (val && val.trim()) {
+                sb += (k + '=' + val.trim() + '&');
+            }
+        })
+        sb += ('key=' + signKey);
+
+        return MD5.md5(sb).toUpperCase();
     }
 
     function error(code, cb) {
@@ -75,35 +113,60 @@ var AJAX = new function () {
         cb && cb({code: -1, msg: "服务器异常"});
     }
 
-    function init(post, url, data, cb, asyn, isJson) {
+    /**
+     * 初始化请求操作
+     * @param method
+     * @param url
+     * @param data 规定data为json格式
+     * @param body body传参，规定post请求，json格式
+     * @param cb
+     * @param asyn
+     */
+    function init(method, url, data, body, cb, asyn) {
         // Comm.loading(true);
         url = t.Uri() + repair(url);
+        let xhrMethod = ("BODY" === method ? "POST" : method);
         if (asyn == null) asyn = true;
-        if (isJson == null) isJson = false;
-        var xhr = new XMLHttpRequest();
+        if (body == null) body = {};
+
+        let xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
-            if (this.readyState == 4) {
-                if (this.status == 200) {
+            if (this.readyState === 4) {
+                if (this.status === 200) {
                     finish(this.responseText, cb);
                 } else {
                     error(this.status, cb);
                 }
             }
         };
-        xhr.open(post ? "POST" : "GET", url, asyn);
 
-        var ag = ab();
-        if (ag)
-            xhr.setRequestHeader('x-Agent', ag);
-        if (post && isJson) {
-            data = JSON.stringify(data);
-            xhr.setRequestHeader("Content-Type", "application/json");
-            // console.log("post for json");
-        } else if (post) {
+        // // 参数数据加密处理
+        // // 仅可校验非body参数，因为body参数在后端仅可被读取一次，重复读取将会抛异常，所以无法加密的，而且body还可能是二进制文件，是不方便加密和重复读取的，流的特性只可被读取一次
+        // data.sign = generateSignature(data);
+
+        let ag = ab();
+        if ("GET" === method) {
             data = deobj(data);
+            url += (url.indexOf("?") === -1 ? "?" : "") + data;
+            data = null;
+
+            xhr.open(xhrMethod, url, asyn);
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            // console.log("post for parameter");
+        } else if ("BODY" === method) {
+            data = deobj(data);
+            url += (url.indexOf("?") === -1 ? "?" : "") + data;
+            data = JSON.stringify(body);
+
+            xhr.open(xhrMethod, url, asyn);
+            xhr.setRequestHeader("Content-Type", "application/json");
+        } else {
+            data = deobj(data);
+
+            xhr.open(xhrMethod, url, asyn);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         }
+        xhr.setRequestHeader("Authorization", ag ? "Bearer " + ag : "Basic SFlDQk9CVmN4N2ltbUQzTDolTlVPaVQ5RiVPUCk2UGwhM1BDdw==");
+
         xhr.send(data);
         // Comm.loading(false);
     }
@@ -149,12 +212,24 @@ var AJAX = new function () {
     };
 
     /*执行GET方法，一般用于从服务器获取数据，api长度尽量不超过1000字节*/
-    t.GET = function (api, cb, asyn) {
-        init(false, api, null, cb, asyn);
+    t.GET = function (api, data, cb, asyn) {
+        init("GET", api, data, null, cb, asyn);
     };
     /*执行POST方法，一般用于向服务器提交数据，data建议不为空*/
     t.POST = function (api, data, cb, asyn) {
-        init(true, api, data, cb, asyn);
+        init("POST", api, data, null, cb, asyn);
+    };
+    /*执行POST BODY传参，data建议不为空*/
+    t.BODY = function (api, data, body, cb, asyn) {
+        init("BODY", api, data, body, cb, asyn);
+    };
+    /*执行DELETE方法*/
+    t.DELETE = function (api, data, cb, asyn) {
+        init("DELETE", api, data, null, cb, asyn);
+    };
+    /*执行PUT方法，一般用于向服务器提交数据，data建议不为空*/
+    t.PUT = function (api, data, cb, asyn) {
+        init("PUT", api, data, null, cb, asyn);
     };
     /*根据用户凭证判断用户是否登录*/
     t.isLogin = function () {
@@ -373,29 +448,6 @@ var Comm = {
             return (Number(v) / 100).toFixed(2);
         }
     },
-
-    actType: function (value) {
-        if (isNaN(value))
-            return '暂无';
-        if (value == 1)
-            return "充值";
-        else if (value == 2) return "购买会员";
-        else if (value == 3) return "商城消费";
-        else if (value == 4) return "推荐奖励";
-        else if (value == 5) return "佣金";
-        else if (value == 6) return "平台补助";
-        else if (value == 7) return "差额";
-        else if (value == 8) return "提现";
-        else if (value == 9) return "平台奖励";
-        else if (value == 10) return "店铺付款";
-        else if (value == 11) return "合伙人还加盟费";
-        else if (value == 12) return "结算";
-        else if (value == 13) return "注册";
-        else if (value == 14) return "抢红包";
-        else if (value == 15) return "售后退款";
-        else if (value == 16) return "提现失败退款";
-        else return '暂无';
-    },
     onlyNum: function (dom, n) {
         // 仅可是正数
         // 后方可保留的小数位数
@@ -596,153 +648,6 @@ var Comm = {
         }
         return t;
     },
-    //年级转换
-    nclass: function (d) {
-        var ncla = [];
-        var a = [];
-        console.log(d)
-        if (typeof (d) == 'number') {
-            a.push(d);
-        } else {
-            a = d;
-        }
-        for (var i = 0; i < a.length; i++) {
-            if (a[i] == 1) {
-                ncla.push('一年级');
-            } else if (a[i] == 2) {
-                ncla.push('二年级');
-            } else if (a[i] == 3) {
-                ncla.push('三年级');
-            } else if (a[i] == 4) {
-                ncla.push('四年级');
-            } else if (a[i] == 5) {
-                ncla.push('五年级');
-            } else if (a[i] == 6) {
-                ncla.push('六年级');
-            } else if (a[i] == 7) {
-                ncla.push('初一');
-            } else if (a[i] == 8) {
-                ncla.push('初二');
-            } else if (a[i] == 9) {
-                ncla.push('初三');
-            } else if (a[i] == 10) {
-                ncla.push('高一');
-            } else if (a[i] == 11) {
-                ncla.push('高二');
-            } else if (a[i] == 12) {
-                ncla.push('高三');
-            } else {
-                ncla.push('暂无年级');
-            }
-        }
-        console.log(ncla)
-        return ncla;
-    },
-    //计算年级班级
-    getGradeByStudentYearAndTime: function (v) {
-        //debugger;
-        if (!v) {
-            return ''
-        }
-
-        function getMonthAddDay(month, day) {
-            var monthStr = "" + month;
-            var dayStr = day >= 10 ? ("" + day) : ("0" + day);
-            var monthDay = monthStr + dayStr;
-            return monthDay / 1;
-        }
-
-        function comp(studentYear) {
-            var now = new Date();
-
-            var year = now.getFullYear();
-            var month = now.getMonth() + 1;
-            var day = now.getDate();
-            var monthDay = getMonthAddDay(month, day);
-
-            if (monthDay < 815) {
-                return year - studentYear;
-            }
-            return year - studentYear + 1;
-        }
-
-        var r = [];
-        var dd = v.split(',');
-        for (var i = 0; i < dd.length; i++) {
-            if (dd[i] !== "") {
-                var str = [];
-                if (dd[i].indexOf("@") >= 0) {
-                    str = dd[i].split("@");
-                } else {
-                    str.push(dd[i]);
-                }
-                var startYear = str[0] * 1; //开始学年
-                //根据 开始学年 计算 年级
-                var nj = comp(startYear);
-                var rs = Comm.nclass(nj);
-                if (str.length > 1) {
-                    //班级
-                    rs = rs + str[1] + "班";
-                }
-
-                var robj = {rs: rs, nj: nj, bj: str[1]};
-                r.push(robj);
-            }
-        }
-        return r;
-    },
-    //计算年级班级-增减餐申请
-    getbn: function (v) {
-        function getMonthAddDay(month, day) {
-            var monthStr = "" + month;
-            var dayStr = day >= 10 ? ("" + day) : ("0" + day);
-            var monthDay = monthStr + dayStr;
-            return monthDay / 1;
-        }
-
-        function comp(studentYear) {
-            var now = new Date();
-
-            var year = now.getFullYear();
-            var month = now.getMonth() + 1;
-            var day = now.getDate();
-            var monthDay = getMonthAddDay(month, day);
-            if (monthDay < 215) {
-                return year - studentYear;
-            }
-            if (monthDay > 215 && monthDay < 815) {
-                return year - studentYear + 1;
-            }
-            return year - studentYear + 1;
-        }
-
-        var r = [];
-        var dd = v.split(',');
-        for (var i = 0; i < dd.length; i++) {
-            var str = dd[i].split("@");
-            var startYear = str[0] * 1; //开始学年
-            //班级
-            var bj = str[1];
-            //根据 开始学年 计算 年级
-            var nj = comp(startYear);
-            r.push(Comm.nclass(nj));
-        }
-        return r;
-    },
-    yclx: function (d) {
-        console.log(d)
-        var t = [];
-        for (var i = 0; i < d.length; i++) {
-            if (d[i] == 1) {
-                t.push('早餐');
-            } else if (d[i] == 2) {
-                t.push('午餐');
-            } else if (d[i] == 3) {
-                t.push('晚餐');
-            }
-        }
-        return t;
-    },
 };
 
 var $ = null;
@@ -856,64 +761,3 @@ window.onload = function () {
 
     });
 };
-
-
-//发送消息 sendMsg('1','aaaa','bbbbbbbb','3')
-//msgType:
-var sendMsg = function (msgType, title, content, itemType, customerId, itemId) {
-    var opt = {
-        messType: msgType,
-        customerId: customerId,
-        messTitle: title,
-        content: content,
-        itemType: itemType,
-        itemId: itemId,
-        userType: '1'
-    }
-    AJAX.POST('/api/mess/send', opt, function (d) {
-        if (d.code == 1) {
-
-        } else {
-            Comm.message(d.msg);
-        }
-
-    });
-}
-
-var mtitle = {
-    0: '增减餐审核通知',
-    1: '终止合同审核通知',
-    2: '售后审核通知',
-    3: '校商供应关系通知'
-}
-var mc = {
-    0: '增减餐审核通过',
-    1: '增减餐审核拒绝',
-    7: '供应商已同意您的提前解约申请',
-    8: '供应商已拒绝您的提前解约申请'
-}
-//var itemType = {
-//	0: '商品订单消息',
-//	1: '餐费消息',
-//	2: '审核消息',
-//	3: '系统通知消息',
-//}
-
-var emnu = {
-    state: {
-        0: '待审核',
-        1: '同意',
-        2: '拒绝',
-        3: '驳回',
-        6: '已过期',
-        '': '-',
-    },
-    state1: {
-        0: '删除',
-        1: '正常',
-        2: '拒绝',
-        3: '驳回',
-        6: '已过期',
-        '': '-',
-    }
-}
