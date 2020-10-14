@@ -1,4 +1,4 @@
-var config = {
+const config = {
     root: 'http://127.0.0.1:9233',
     ueditor: 'http://127.0.0.1/ueditor/',
     ossroot: 'http://xxx.oss-cn-hangzhou.aliyuncs.com/',
