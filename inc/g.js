@@ -1,4 +1,4 @@
-const config = {
+var config = {
     root: 'http://127.0.0.1:9233',
     ueditor: 'http://127.0.0.1/ueditor/',
     ossroot: 'http://xxx.oss-cn-hangzhou.aliyuncs.com/',
@@ -59,10 +59,13 @@ var AJAX = new function () {
         return api;
     }
 
-    function deobj(obj) {
+    function deobj(obj, url) {
         if (obj == null) return "";
         let s = [];
         let data = {};
+        // 如果传入了url，那么就从url中解析参数，如果有则用于加密（在设置参数名称时禁止重名，否则会被覆盖
+        if (url) urlParame(url, data);
+
         for (let i in obj) {
             if (typeof obj[i] == typeof "") {
                 if (obj[i].indexOf("%") > 0) obj[i] = obj[i].replace(/%/g, "%25");
@@ -78,6 +81,25 @@ var AJAX = new function () {
         s.push(signField + "=" + generateSignature(data))
 
         return s.join("&");
+    }
+
+    /**
+     * 从url中解析参数并追加到已有参数对象中
+     */
+    function urlParame(url, param) {
+        let index = url.indexOf("?");
+        if (index !== -1) {
+            let str = url.substring(index + 1)
+            if (str) {
+                if (param == null) param = {};
+                str.split("&").forEach(v => {
+                    let o = v.split("=");
+                    param[o[0]] = o[1];
+                })
+            }
+        }
+
+        return param
     }
 
     /**
@@ -143,21 +165,17 @@ var AJAX = new function () {
             }
         };
 
-        // // 参数数据加密处理
-        // // 仅可校验非body参数，因为body参数在后端仅可被读取一次，重复读取将会抛异常，所以无法加密的，而且body还可能是二进制文件，是不方便加密和重复读取的，流的特性只可被读取一次
-        // data.sign = generateSignature(data);
-
         let ag = ab();
         if ("GET" === method) {
             data = deobj(data);
-            url += (url.indexOf("?") === -1 ? "?" : "") + data;
+            url += (url.indexOf("?") === -1 ? "?" : "&") + data;
             data = null;
 
             xhr.open(xhrMethod, url, asyn);
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         } else if ("BODY" === method) {
             data = deobj(data);
-            url += (url.indexOf("?") === -1 ? "?" : "") + data;
+            url += (url.indexOf("?") === -1 ? "?" : "&") + data;
             data = JSON.stringify(body);
 
             xhr.open(xhrMethod, url, asyn);
