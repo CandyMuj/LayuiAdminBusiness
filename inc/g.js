@@ -244,7 +244,7 @@ var AJAX = new function () {
     /*自定义初始化，一般用于框架内的组件调用，如：table，因为无法确认使用post还是get所以需要手动在组件内初始化，其他类似的也是这个道理*/
     t.INIT = function (method, url, data, body, cb, asyn) {
         init(method, url, data, body, cb, asyn);
-    }
+    };
     /*执行GET方法，一般用于从服务器获取数据，api长度尽量不超过1000字节*/
     t.GET = function (api, data, cb, asyn) {
         init(t.SUPPORT.GET, api, data, null, cb, asyn);
