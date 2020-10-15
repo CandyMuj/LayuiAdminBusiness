@@ -147,7 +147,7 @@ var AJAX = new function () {
      */
     function init(method, url, data, body, cb, asyn) {
         // Comm.loading(true);
-        url = t.Uri() + repair(url);
+        url = t.Uri() + url;
         let xhrMethod = ("BODY" === method ? "POST" : method);
         if (asyn == null) asyn = true;
         if (body == null) body = {};
@@ -167,21 +167,21 @@ var AJAX = new function () {
 
         let ag = ab();
         if ("GET" === method) {
-            data = deobj(data);
+            data = deobj(data, url);
             url += (url.indexOf("?") === -1 ? "?" : "&") + data;
             data = null;
 
             xhr.open(xhrMethod, url, asyn);
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         } else if ("BODY" === method) {
-            data = deobj(data);
+            data = deobj(data, url);
             url += (url.indexOf("?") === -1 ? "?" : "&") + data;
             data = JSON.stringify(body);
 
             xhr.open(xhrMethod, url, asyn);
             xhr.setRequestHeader("Content-Type", "application/json");
         } else {
-            data = deobj(data);
+            data = deobj(data, url);
 
             xhr.open(xhrMethod, url, asyn);
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
