@@ -515,53 +515,6 @@ var Comm = {
             return num;
         }
     },
-    wait: 60,
-    timeCountDownclick: true,
-    timeCountDown: function (o, phone, type, imgcode) {
-        /*发送验证码公用方法*/
-        /*o 点击发送验证码按钮*/
-        /*phone 发送短信手机号*/
-        /*type 验证码类型*/
-        /*imgcode 图片验证码，可不传*/
-        /*调用 app.timeCountDown(this,15928877394,1,5421)*/
-        //按钮倒计时
-        imgcode = imgcode == undefined ? "" : imgcode;
-        if (!phone) {
-            layer.msg("请输入手机号");
-            return;
-        }
-        var reg = /^1\d{10}$/;
-        if (phone && !reg.test(phone)) {
-            layer.msg("手机格式错误");
-            return;
-        }
-        if (Comm.timeCountDownclick) {
-            Comm.timeCountDownclick = false;
-            o.setAttribute("disabled", true);
-            AJAX.GET("/api/customer/sendSMS?phone=" + phone + "&type=" + type + "&_device=" + 1,
-                function (d) {
-                    if (d.code == 1) {
-                        layer.msg("短信已发送，请注意查收");
-                        var i = setInterval(function () {
-                            if (Comm.wait == 0) {
-                                o.removeAttribute("disabled");
-                                o.value = "重新发送";
-                                Comm.wait = 60;
-                                clearInterval(i);
-                            } else {
-                                o.value = Comm.wait + "秒后重发";
-                                Comm.wait--;
-                            }
-                        }, 1000);
-                    } else {
-                        o.removeAttribute("disabled");
-                        layer.msg(d.msg);
-                    }
-                    Comm.timeCountDownclick = true;
-                }
-            );
-        }
-    },
     GetData: function (id) {
         var p = {};
         var id = id == undefined || id == "" ? "form" : id;
@@ -745,7 +698,6 @@ window.onload = function () {
         });
 
         $(document).off('click', '.layui-table-tips-main [lay-event]').on('click', '.layui-table-tips-main [lay-event]', function (event) {
-
             var elem = $(this);
             var tableTrCurr = _tableTrCurr;
             if (!tableTrCurr) {
@@ -757,7 +709,6 @@ window.onload = function () {
             _tableTrCurr.find('[lay-event="' + elem.attr('lay-event') + '"]').first().click();
         });
         /*---------------------------------------------------------------------------------------------------*/
-
 
     });
 };
