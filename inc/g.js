@@ -194,6 +194,15 @@ var AJAX = new function () {
 
     /*----AJAX公用方法-----*/
 
+    /* 支持的请求方式 */
+    t.SUPPORT = {
+        GET: 'GET',
+        POST: 'POST',
+        BODY: 'BODY',
+        DELETE: 'DELETE',
+        PUT: 'PUT',
+    }
+
     /*获取服务器接口根路径*/
     t.Uri = function () {
         return window["config"] && window["config"]["root"] ? config.root : "";
@@ -232,25 +241,29 @@ var AJAX = new function () {
         Comm.db("_userinfo", null);
     };
 
+    /*自定义初始化，一般用于框架内的组件调用，如：table，因为无法确认使用post还是get所以需要手动在组件内初始化，其他类似的也是这个道理*/
+    t.INIT = function (method, url, data, body, cb, asyn) {
+        init(method, url, data, body, cb, asyn);
+    }
     /*执行GET方法，一般用于从服务器获取数据，api长度尽量不超过1000字节*/
     t.GET = function (api, data, cb, asyn) {
-        init("GET", api, data, null, cb, asyn);
+        init(t.SUPPORT.GET, api, data, null, cb, asyn);
     };
     /*执行POST方法，一般用于向服务器提交数据，data建议不为空*/
     t.POST = function (api, data, cb, asyn) {
-        init("POST", api, data, null, cb, asyn);
+        init(t.SUPPORT.POST, api, data, null, cb, asyn);
     };
     /*执行POST BODY传参，data建议不为空*/
     t.BODY = function (api, data, body, cb, asyn) {
-        init("BODY", api, data, body, cb, asyn);
+        init(t.SUPPORT.BODY, api, data, body, cb, asyn);
     };
     /*执行DELETE方法*/
     t.DELETE = function (api, data, cb, asyn) {
-        init("DELETE", api, data, null, cb, asyn);
+        init(t.SUPPORT.DELETE, api, data, null, cb, asyn);
     };
     /*执行PUT方法，一般用于向服务器提交数据，data建议不为空*/
     t.PUT = function (api, data, cb, asyn) {
-        init("PUT", api, data, null, cb, asyn);
+        init(t.SUPPORT.PUT, api, data, null, cb, asyn);
     };
     /*根据用户凭证判断用户是否登录*/
     t.isLogin = function () {
