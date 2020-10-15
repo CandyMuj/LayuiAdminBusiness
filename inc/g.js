@@ -13,7 +13,8 @@ var AJAX = new function () {
         abs = null,
         t = this;
     const signField = 'sign',
-        signKey = 'SxgKESLGzlw@iH8f';
+        signKey = 'SxgKESLGzlw@iH8f',
+        signNonce = 'nonce_str';
 
     function finish(v, cb) {
         if (cb == null) return;
@@ -128,7 +129,8 @@ var AJAX = new function () {
         let xhrMethod = ("BODY" === method ? "POST" : method);
         if (asyn == null) asyn = true;
         if (body == null) body = {};
-        if (data == null) data = {nonce_str: Comm.uuid()} else data.nonce_str = Comm.uuid();
+        data = (data == null) ? {} : data;
+        data[signNonce] = Comm.uuid();
 
         let xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
