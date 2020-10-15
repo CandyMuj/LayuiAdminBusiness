@@ -128,6 +128,7 @@ var AJAX = new function () {
         let xhrMethod = ("BODY" === method ? "POST" : method);
         if (asyn == null) asyn = true;
         if (body == null) body = {};
+        if (data == null) data = {nonce_str: Comm.uuid()} else data.nonce_str = Comm.uuid();
 
         let xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
@@ -237,6 +238,12 @@ var AJAX = new function () {
     };
 }();
 var Comm = {
+    // 生成uuid
+    uuid: function uuid() {
+        return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+        )
+    },
     //限制字数
     limitSize: function (a, v, size, remark) {
         var str = $(a + "[name='" + v + "']").val();
