@@ -29,7 +29,7 @@ var AJAX = new function () {
         if (o && o.code < 0) {
             Comm.message(o.msg);
         }
-        if (o && o.code == 110) {
+        if (o && o.code === 403) {
             Comm.msg("登录已过期，请重新登录", 5);
             setTimeout(function () {
                 AJAX.clearTag();

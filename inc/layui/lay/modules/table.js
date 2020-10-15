@@ -349,7 +349,7 @@ layui.define(["laytpl", "laypage", "layer", "form", "util"],
                             },
                             success: function (t) {
                                 //2018-11-29 zj 修改
-                                if (t && t.code == 110) {
+                                if (t && t.code === 403) {
                                     Comm.msg("登录已过期，请重新登录", 5);
                                     setTimeout(function () {
                                         AJAX.clearTag();
