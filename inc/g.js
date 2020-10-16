@@ -212,7 +212,7 @@ var AJAX = new function () {
 
     /*拼接请求路径*/
     t.Url = function (uri) {
-        return t.Uri + uri;
+        return t.Uri() + uri;
     }
 
     /*获取服务器调试页面根路径*/
