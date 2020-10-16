@@ -210,6 +210,11 @@ var AJAX = new function () {
         return window["config"] && window["config"]["root"] ? config.root : "";
     };
 
+    /*拼接请求路径*/
+    t.Url = function (uri) {
+        return t.Uri + uri;
+    }
+
     /*获取服务器调试页面根路径*/
     t.WebRoot = function () {
         return window["config"] && window["config"]["webroot"] ? config.webroot : "";
