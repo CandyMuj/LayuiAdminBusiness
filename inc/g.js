@@ -53,9 +53,11 @@ var AJAX = new function () {
     }
 
     function repair(api) {
-        var a = ab();
-        if (a)
-            api += (api.indexOf("?") > 0 ? "&" : "?") + K + "=" + a + "&timespan=" + Math.random();
+        // var a = ab();
+        // if (a)
+        //     api += (api.indexOf("?") > 0 ? "&" : "?") + K + "=" + a + "&timespan=" + Math.random();
+        // return api;
+        api += (api.indexOf("?") > 0 ? "&" : "?") + "timespan=" + Math.random();
         return api;
     }
 
@@ -147,7 +149,7 @@ var AJAX = new function () {
      */
     function init(method, url, data, body, cb, asyn) {
         // Comm.loading(true);
-        url = t.Uri() + url;
+        url = t.Uri() + repair(url);
         let xhrMethod = ("BODY" === method ? "POST" : method);
         if (asyn == null) asyn = true;
         if (body == null) body = {};
