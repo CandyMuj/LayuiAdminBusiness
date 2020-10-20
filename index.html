@@ -159,6 +159,7 @@
 
 <script type="text/javascript" src="inc/g.js"></script>
 <script type="text/javascript" src="inc/jquery.md5.js"></script>
+<script type="text/javascript" src="inc/config/m.js"></script>
 <script type="text/javascript" src="inc/layui/layui.js"></script>
 <script type="text/javascript">
     var cms = null;
@@ -178,22 +179,7 @@
         layui.use(['cms', 'laytpl', 'form',], function () {
             cms = layui.cms('left-nav', 'top-tab');
 
-            let menu = [
-                {
-                    id: 1,
-                    pid: 0,
-                    node: "试试",
-                    url: "http://www.baidu.com",
-                    icon: ""
-                },
-                {
-                    id: 2,
-                    pid: 0,
-                    node: "试1试",
-                    url: "http://www.baidu.com",
-                    icon: ""
-                }
-            ];
+            let menu = _menu_;
 
             initmenu();
 
