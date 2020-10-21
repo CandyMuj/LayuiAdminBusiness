@@ -31,14 +31,7 @@ var AJAX = new function () {
         }
         if (o && o.code === 403) {
             Comm.msg("登录已过期，请重新登录", 5);
-            setTimeout(function () {
-                AJAX.clearTag();
-                if (self == top) {
-                    location.href = config.base + 'login.html';
-                } else {
-                    top.location.href = config.base + 'login.html';
-                }
-            }, 2000);
+            AJAX.clearTag();
             return;
         }
         cb(o);
@@ -242,10 +235,19 @@ var AJAX = new function () {
         });
     };
 
-    /*退出登录清除token*/
+    /*退出登录清除token，并跳转到登录*/
     t.clearTag = function () {
-        Comm.db(K, null);
-        Comm.db("_userinfo", null);
+        abs = null;
+        top.Comm.db(K, null);
+        top.Comm.db("_userinfo", null);
+
+        setTimeout(function () {
+            if (self == top) {
+                location.href = config.base + 'login.html';
+            } else {
+                top.location.href = config.base + 'login.html';
+            }
+        }, 2000);
     };
 
     /*自定义初始化，一般用于框架内的组件调用，如：table，因为无法确认使用post还是get所以需要手动在组件内初始化，其他类似的也是这个道理*/
