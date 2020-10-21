@@ -348,18 +348,6 @@ layui.define(["laytpl", "laypage", "layer", "form", "util"],
                             i.layMain.html('<div class="' + f + '">数据接口请求异常：' + ((res && res.msg ? res.msg : "error")) + "</div>");
                             i.renderForm();
                             i.setColsWidth();
-                        } else if (res.code === 403) {
-                            Comm.msg("登录已过期，请重新登录", 5);
-                            setTimeout(function () {
-                                    AJAX.clearTag();
-                                    if (self == top) {
-                                        location.href = config.base + 'login.html';
-                                    } else {
-                                        top.location.href = config.base + 'login.html';
-                                    }
-                                },
-                                2000);
-                            return false;
                         } else {
                             if (res.totalCount != null && res.curPage) {
                                 if (res.curPage === 1) {
