@@ -161,7 +161,6 @@
     </div>
 </div>
 <div class="bbg" style="padding-top:8%;">
-
     <fieldset class="layui-elem-field bg_white" style="width: 380px;border-radius:5px;margin: auto;margin-top: -1.5em;">
         <div class="flex_center marb30" style="margin-top:50px;margin-bottom:40px;">
             <div id="loginbut" class="bold f18" style="color:#1b365d">系统登录</div>
@@ -169,7 +168,7 @@
         <div class="layui-form" action="">
             <div class="layui-form-item flex_center" style="margin-bottom:0px;">
                 <div class="layui-input-inline iphoneImg" style="width: 240px;margin-right:0px;">
-                    <input value="" maxlength="11" type="text" name="phone" required lay-verify="required"
+                    <input value="" maxlength="11" type="text" name="account" required lay-verify="required"
                            placeholder="请输入账号" autocomplete="off" class="layui-input bor0">
                 </div>
             </div>
@@ -206,95 +205,6 @@
         Copyright©2018-2020&nbsp;xxx.xx.&nbsp;All&nbsp;Rights&nbsp;Resenved&nbsp;
     </div>
 </div>
-<script type="text/html" id="formTpl3">
-    <div id="form1" class="layui-form" style="margin-top:50px;margin-right:170px;margin-left:120px">
-        <div class="layui-form-item flex">
-            <div class="jiantBgRed flex flex_item_center flex_center col_white positionRl24">验证手机号</div>
-            <div class="jiantBgHui flex flex_item_center flex_center col_lgray positionRl12">重置登录密码</div>
-            <div class="jiantBgHui flex flex_item_center flex_center col_lgray">找回密码成功</div>
-        </div>
-        <div style="margin-left:60px;padding-top:30px;">
-            <div class="layui-form-item">
-                <label class="layui-form-label col_lgray f16">找回账户</label>
-                <div class="layui-input-block flex">
-                    <input value="" type="text" name="key" lay-verify="required" autocomplete="off"
-                           placeholder="请输入手机号或邮箱" class="layui-input f14" style="height:45px;width:320px"/>
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label col_lgray f16"
-                       style="height:45px;padding-top:0px;padding-bottom:0px;line-height:45px;">验证码</label>
-                <div class="layui-input-block flex">
-                    <input value="" type="text" name="key" lay-verify="required" autocomplete="off"
-                           placeholder="请输入验证码" class="layui-input f14" style="height:45px;width:180px"/>
-                    <button id="yzm" class="marl10 layui-btn tabBtn marr20" style="height:45px;width:140px"
-                            onclick="yzm();return false;">获取验证码
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="layui-form-item mart30">
-            <div class="flex flex_center">
-                <button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="sub"
-                        style="height:40px;width:150px">下一步
-                </button>
-            </div>
-        </div>
-    </div>
-    <div id="form2" class="layui-form hide" style="margin-top:50px;margin-right:170px;margin-left:120px">
-        <div class="layui-form-item flex">
-            <div class="jiantBgRed flex flex_item_center flex_center col_white positionRl24">验证手机号</div>
-            <div class="jiantBgRed flex flex_item_center flex_center col_white positionRl12">重置登录密码</div>
-            <div class="jiantBgHui flex flex_item_center flex_center col_lgray">找回密码成功</div>
-        </div>
-        <div style="margin-left:60px;padding-top:30px;">
-            <div class="layui-form-item">
-                <label class="layui-form-label col_lgray f16">新密码</label>
-                <div class="layui-input-block flex">
-                    <input value="" type="text" name="key" lay-verify="required" autocomplete="off"
-                           placeholder="请输入新密码" class="layui-input f14" style="height:45px;width:320px"/>
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label col_lgray f16"
-                       style="height:45px;padding-top:0px;padding-bottom:0px;line-height:45px;">确认密码</label>
-                <div class="layui-input-block flex">
-                    <input value="" type="text" name="key" lay-verify="required" autocomplete="off"
-                           placeholder="请输入新密码" class="layui-input f14" style="height:45px;width:320px"/>
-                </div>
-            </div>
-        </div>
-        <div class="layui-form-item mart30">
-            <div class="flex flex_center">
-                <button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="sub"
-                        style="height:40px;width:150px">下一步
-                </button>
-            </div>
-        </div>
-    </div>
-    <div id="form3" class="layui-form hide" style="margin-top:50px;margin-right:170px;margin-left:120px">
-        <div class="layui-form-item flex">
-            <div class="jiantBgRed flex flex_item_center flex_center col_white positionRl24">验证手机号</div>
-            <div class="jiantBgRed flex flex_item_center flex_center col_white positionRl12">重置登录密码</div>
-            <div class="jiantBgRed flex flex_item_center flex_center col_white">找回密码成功</div>
-        </div>
-        <div>
-            <div class="layui-form-item flex_item_center flex_center">
-                <div class="layui-form-label col_lgray f16 gou"></div>
-            </div>
-            <div class="layui-form-item flex_center">
-                <div class="f16" style="padding-left:0px">恭喜您，您的密码重置成功</div>
-            </div>
-            <div class="layui-form-item mart30">
-                <div class="flex flex_center">
-                    <button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="sub"
-                            style="height:40px;width:150px">去登陆
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</script>
 <script type="text/html" id="formTpl2">
     <div id="forma1" class="layui-form" style="margin-top:30px;margin-right:60px;margin-left:60px;">
         <div style="width:100%">
@@ -320,6 +230,9 @@
     </div>
 </script>
 <script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/config/i.js"></script>
+<script type="text/javascript" src="inc/jquery.md5.js"></script>
+<script type="text/javascript" src="inc/client.min.js"></script>
 <script type="text/javascript" src="inc/layui/layui.js"></script>
 <script type="text/javascript" src="inc/area.js"></script>
 <script type="text/javascript">
@@ -342,130 +255,29 @@
         })
     }
 
-    function bdsj() {
-        Comm.laytpl($("#formTpl3").html()).render({}, function (html) {
-            layer.open({
-                type: 1,
-                title: '找回密码',
-                area: ['800px', '420px'],
-                maxmin: true,
-                content: html,
-                success: function (layero) {
-                    Comm.SetData({}, 'form')
-
-                    //验证必填项
-                    Comm.form.verify();
-                    //提交表单
-                    Comm.form.on('submit(sub)', function (data) {
-                        if (!$("#form1").is('.hide')) {
-                            $("#form1").addClass('hide');
-                            $("#form2").removeClass('hide');
-                            return;
-                        }
-                        if (!$("#form2").is('.hide')) {
-                            $("#form2").addClass('hide');
-                            $("#form3").removeClass('hide');
-                            return;
-                            AJAX.POST('', data.field, function (d) {
-                                if (d.code == 1) {
-                                    layer.closeAll();
-                                    layer.msg("保存成功!", {
-                                        icon: 1
-                                    });
-                                    //执行重载
-                                    Comm.table.reload('table');
-                                } else {
-                                    layer.msg("保存失败!", {
-                                        icon: 5
-                                    })
-                                }
-                            })
-                        }
-                        if (!$("#form3").is('.hide')) {
-                            Comm.go("login.html");
-                        }
-                    });
-                    $(".layui-layer-close").click(function () {
-                        Comm.go("login.html");
-                    })
-                }
-            });
-        })
-
-    }
-
-    function yzm() {
-        var time = 60;
-        settime();
-
-        function settime() {
-            if (time == 0) {
-                $("#yzm").text("获取验证码");
-                $("#yzm").css("background-color", "#FFFFFF");
-                $("#yzm").css("border-color", "#E23339");
-                $("#yzm").css("color", "#E23339");
-                $("#yzm").attr("disabled", false);
-                return;
-            } else {
-                $("#yzm").text(time + "S后重新发送");
-                $("#yzm").css("background-color", "#EDEDED");
-                $("#yzm").css("border-color", "#EDEDED");
-                $("#yzm").css("color", "#B3B3B3");
-                $("#yzm").attr("disabled", true);
-                time--;
-            }
-            setTimeout(function () {
-                settime()
-            }, 1000)
-        }
-    }
-
-    function yzm2() {
-        var time = 60;
-        settime();
-
-        function settime() {
-            if (time == 0) {
-                $("#yzm2").text("获取验证码");
-                $("#yzm2").css("background-color", "#FFFFFF");
-                $("#yzm2").css("border-color", "#E23339");
-                $("#yzm2").css("color", "#E23339");
-                $("#yzm2").attr("disabled", false);
-                return;
-            } else {
-                $("#yzm2").text(time + "S后重新发送");
-                $("#yzm2").css("background-color", "#EDEDED");
-                $("#yzm2").css("border-color", "#EDEDED");
-                $("#yzm2").css("color", "#B3B3B3");
-                $("#yzm2").attr("disabled", true);
-                time--;
-            }
-            setTimeout(function () {
-                settime()
-            }, 1000)
-        }
-    }
-
     function pageload() {
+        let client = new ClientJS();
+
         // 跟换验证码
         $('#verifyCode').click(() => {
-            $('#verifyCode').attr('src', config.root + '/common/verifyCode/create?x=' + Math.floor(Math.random() * 100));
+            $('#verifyCode').attr('src', AJAX.Url(IFACE.third.imgCode) + '?x=' + Math.floor(Math.random() * 100) + '&fingerprint=' + String(client.getFingerprint()));
         });
         $('#verifyCode').click();
 
         //监听提交
         Comm.form.on('submit(login)', function (data) {
+            data.field.fingerprint = String(client.getFingerprint());
+
             //这里可以发起ajax请求进行登录验证
-            AJAX.POST("/admin/user/login", data.field, function (d) {
-                if (d.code == 1) {
+            AJAX.POST(IFACE.acccount.login, data.field, function (d) {
+                if (d.code === 1) {
                     Comm.db("_token", d.data.token);
-                    Comm.db("user", d.data.data);
-                    Comm.db("isgod", d.data.data.customerId === 1);
+                    Comm.db("user", d.data.account);
+                    Comm.db("isgod", false);
                     Comm.go("index.html");
                 } else {
-                    layer.msg(d.msg, {
-                        icon: 5
-                    })
+                    $('#verifyCode').click();
+                    Comm.msg(d.msg, 5);
                 }
             });
         });

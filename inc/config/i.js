@@ -19,8 +19,11 @@
  */
 
 var IFACE = {
+    third: {
+        // 获取图形验证码
+        imgCode: "/third/img/code",
+    },
     acccount: {
-        // 管理端-新增/修改账号
-        addOrUpd: "/account/admin/addOrUpd"
+        login: "/account/admin/login",
     }
 }
