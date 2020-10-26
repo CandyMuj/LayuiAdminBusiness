@@ -27,3 +27,27 @@ var IFACE = {
         login: "/account/admin/login",
     }
 }
+
+
+/**
+ * 直接请求封装
+ */
+var REQ = {
+    /* 查询省份 */
+    areaList: function () {
+        let cacheKey = "_area_list_cache_";
+        let areaList = Comm.db(cacheKey);
+        if (!areaList || areaList.length <= 0) {
+            AJAX.GET('IFACE.strategyDetails.areaList', {}, (d) => {
+                if (d.code === 1) {
+                    areaList = d.data;
+                    Comm.db(cacheKey, areaList);
+                } else {
+                    Comm.msg("初始化省份信息失败", 5);
+                }
+            }, false)
+        }
+
+        return areaList || [];
+    }
+}
