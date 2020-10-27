@@ -280,6 +280,58 @@ var AJAX = new function () {
     };
 }();
 var Comm = {
+    /**
+     * json格式化输出到页面
+     *
+     * @param json json数据对象或者json字符串
+     * @param preId pre标签id，用于页面展示
+     * @returns {string}
+     */
+    /* 需添加css样式
+    <style type="text/css">
+        pre {
+            outline: 1px solid #ccc; padding: 5px; margin: 5px;
+            text-align: left;
+        }
+        .string { color: green; }
+        .number { color: darkorange; }
+        .boolean { color: blue; }
+        .null { color: magenta; }
+        .key { color: red; }
+    </style>
+    <pre id="result"></pre>
+    $('#result').html(syntaxHighlight(res));
+    */
+    jsonSyntaxHighlight: function (json, preId) {
+        if (preId != null) {
+            $('#' + preId).html(toHtml(json));
+        } else {
+            return toHtml(json);
+        }
+
+
+        function toHtml(json) {
+            if (typeof json != 'string') {
+                json = JSON.stringify(json, undefined, 2);
+            }
+            json = json.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = 'number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'key';
+                    } else {
+                        cls = 'string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+    },
     // 生成uuid
     uuid: function uuid() {
         return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
