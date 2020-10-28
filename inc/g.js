@@ -490,7 +490,8 @@ var Comm = {
     },
     msg: function (msg, type) {
         Comm.layer.msg(msg, {
-            icon: type
+            icon: type,
+            zIndex: 9999999999999999999
         });
     },
     alert: function (str, tabCode) {
