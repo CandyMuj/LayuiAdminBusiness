@@ -120,7 +120,7 @@ var AJAX = new function () {
             }
             let val = (data[k] || typeof data[k] === "number") ? String(data[k]).trim() : null;
             if (val) {
-                sb += (k + '=' + val.trim() + '&');
+                sb += (k + '=' + val + '&');
             }
         })
         sb += ('key=' + signKey);
