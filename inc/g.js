@@ -62,14 +62,15 @@ var AJAX = new function () {
         if (url) urlParame(url, data);
 
         for (let i in obj) {
-            if (typeof obj[i] == typeof "") {
-                if (obj[i].indexOf("%") > 0) obj[i] = obj[i].replace(/%/g, "%25");
-                if (obj[i].indexOf("&") > 0) obj[i] = obj[i].replace(/\&/g, "%26");
-                if (obj[i].indexOf("+") > 0) obj[i] = obj[i].replace(/\+/g, "%2B");
+            let val = obj[i];
+            if (typeof val === typeof "") {
+                if (val.indexOf("%") > 0) val = val.replace(/%/g, "%25");
+                if (val.indexOf("&") > 0) val = val.replace(/&/g, "%26");
+                if (val.indexOf("+") > 0) val = val.replace(/\+/g, "%2B");
             }
-            if (obj[i] || typeof obj[i] === "number") {
-                s.push(i + "=" + encodeURIComponent(obj[i]));
-                data[i] = obj[i];
+            if (val || typeof val === "number") {
+                s.push(i + "=" + encodeURIComponent(val));
+                data[i] = val;
             }
         }
 
