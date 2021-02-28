@@ -67,8 +67,10 @@ var AJAX = new function () {
                 if (obj[i].indexOf("&") > 0) obj[i] = obj[i].replace(/\&/g, "%26");
                 if (obj[i].indexOf("+") > 0) obj[i] = obj[i].replace(/\+/g, "%2B");
             }
-            s.push(i + "=" + encodeURIComponent(obj[i]));
-            data[i] = obj[i];
+            if (obj[i] || typeof obj[i] === "number") {
+                s.push(i + "=" + encodeURIComponent(obj[i]));
+                data[i] = obj[i];
+            }
         }
 
         // 参数数据加密处理
@@ -116,8 +118,8 @@ var AJAX = new function () {
             if (k === signField) {
                 return true;
             }
-            let val = String(data[k]);
-            if (val && val.trim()) {
+            let val = (data[k] || typeof data[k] === "number") ? String(data[k]).trim() : null;
+            if (val) {
                 sb += (k + '=' + val.trim() + '&');
             }
         })
