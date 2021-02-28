@@ -50,7 +50,7 @@ var AJAX = new function () {
         // if (a)
         //     api += (api.indexOf("?") > 0 ? "&" : "?") + K + "=" + a + "&timespan=" + Math.random();
         // return api;
-        api += (api.indexOf("?") > 0 ? "&" : "?") + "timespan=" + Math.random();
+        api += (api.indexOf("?") > 0 ? "&" : "?") + "timespan=" + (new Date().getTime());
         return api;
     }
 
