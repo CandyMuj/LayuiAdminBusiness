@@ -1,11 +1,30 @@
 var config = {
-    root: 'http://127.0.0.1:9233',
-    ueditor: 'http://127.0.0.1/ueditor/',
-    ossroot: 'http://xxx.oss-cn-hangzhou.aliyuncs.com/',
-    pageSize: 10,
-    // base: "/a/"
-    base: "/"
+    // 配置环境：dev(本地开发环境) prod(正式生产环境)
+    env: "prod",
+    // --------------------------------------- 如何环境都通用的配置开始
+    pageSize: 10
 };
+(
+    // 根据不同的环境初始化参数
+    function () {
+        switch (config.env) {
+            // 开发环境
+            case "dev":
+                config.root = "http://127.0.0.1:9233";
+                config.ueditor = "http://127.0.0.1/ueditor/";
+                config.ossroot = "http://xxx.oss-cn-hangzhou.aliyuncs.com/";
+                config.base = "/";
+                break;
+            // 默认为正式生产环境
+            default:
+                config.root = "http://127.0.0.1:9233";
+                config.ueditor = "http://127.0.0.1/ueditor/";
+                config.ossroot = "http://xxx.oss-cn-hangzhou.aliyuncs.com/";
+                config.base = "/a/";
+                break;
+        }
+    }
+)()
 
 var AJAX = new function () {
     var _xhr,
