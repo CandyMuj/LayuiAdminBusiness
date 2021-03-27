@@ -75,29 +75,61 @@ var AJAX = new function () {
 
     function deobj(obj, url) {
         if (obj == null) return "";
-        let s = [];
         let data = {};
+        // 常用于文件上传，文件上传没有body和query参数只分，规定只是用formdata即可
+        let isFormData = obj instanceof FormData;
         // 如果传入了url，那么就从url中解析参数，如果有则用于加密（在设置参数名称时禁止重名，否则会被覆盖
         if (url) urlParame(url, data);
 
-        for (let i in obj) {
-            let val = obj[i];
-            if (typeof val === typeof "") {
-                if (val.indexOf("%") > 0) val = val.replace(/%/g, "%25");
-                if (val.indexOf("&") > 0) val = val.replace(/&/g, "%26");
-                if (val.indexOf("+") > 0) val = val.replace(/\+/g, "%2B");
+        if (isFormData) {
+            for (let pair of obj) {
+                let key = pair[0];
+                let val = pair[1];
+
+                if (val instanceof File) {
+                    continue;
+                }
+                if (typeof val === typeof "") {
+                    val = replaceVal(val);
+                }
+                if (val || typeof val === "number") {
+                    data[key] = val;
+                }
             }
-            if (val || typeof val === "number") {
-                s.push(i + "=" + encodeURIComponent(val));
-                data[i] = val;
+
+            // 参数数据加密处理
+            // 仅可校验非body参数，因为body参数在后端仅可被读取一次，重复读取将会抛异常，所以无法加密的，而且body还可能是二进制文件，是不方便加密和重复读取的，流的特性只可被读取一次
+            obj.append(signField, generateSignature(data));
+            return obj;
+        } else {
+            let s = [];
+            for (let i in obj) {
+                if (!obj.hasOwnProperty(i)) {
+                    continue;
+                }
+                let val = obj[i];
+                if (typeof val === typeof "") {
+                    val = replaceVal(val);
+                }
+                if (val || typeof val === "number") {
+                    s.push(i + "=" + encodeURIComponent(val));
+                    data[i] = val;
+                }
             }
+
+            // 参数数据加密处理
+            // 仅可校验非body参数，因为body参数在后端仅可被读取一次，重复读取将会抛异常，所以无法加密的，而且body还可能是二进制文件，是不方便加密和重复读取的，流的特性只可被读取一次
+            s.push(signField + "=" + generateSignature(data));
+            return s.join("&");
         }
 
-        // 参数数据加密处理
-        // 仅可校验非body参数，因为body参数在后端仅可被读取一次，重复读取将会抛异常，所以无法加密的，而且body还可能是二进制文件，是不方便加密和重复读取的，流的特性只可被读取一次
-        s.push(signField + "=" + generateSignature(data))
 
-        return s.join("&");
+        function replaceVal(val) {
+            if (val.indexOf("%") > 0) val = val.replace(/%/g, "%25");
+            if (val.indexOf("&") > 0) val = val.replace(/&/g, "%26");
+            if (val.indexOf("+") > 0) val = val.replace(/\+/g, "%2B");
+            return val;
+        }
     }
 
     /**
@@ -149,8 +181,41 @@ var AJAX = new function () {
     }
 
     function error(code, cb) {
-        Comm.loading();
+        // Comm.loading();
         cb && cb({code: -1, msg: "服务器异常"});
+    }
+
+    /**
+     * js下载文件流二进制流
+     *
+     * @param xhr  XMLHttpRequest对象
+     * @param type 一个字符串，表明该 Blob 对象所包含数据的 MIME 类型。如果类型未知，则该值为空字符串。
+     */
+    function downloadFile(xhr, type) {
+        let headerStr = "filename="
+        let disposition = xhr.getResponseHeader("Content-Disposition");
+        let fileName;
+        if (disposition && disposition.indexOf(headerStr) !== -1) {
+            fileName = disposition.substring(disposition.indexOf(headerStr) + headerStr.length);
+        }
+        if (!fileName) {
+            fileName = String(new Date().getTime());
+        }
+        if (!type) {
+            type = xhr.getResponseHeader("Content-Type");
+        }
+
+        let eleLink = document.createElement('a');
+        eleLink.download = fileName;
+        eleLink.style.display = "none";
+        // 二进制流转变成blob地址
+        let blob = new Blob([xhr.response], {type: type});
+        eleLink.href = URL.createObjectURL(blob);
+        // 自动触发点击
+        document.body.appendChild(eleLink);
+        eleLink.click();
+        // 然后移除
+        document.body.removeChild(eleLink);
     }
 
     /**
@@ -161,21 +226,30 @@ var AJAX = new function () {
      * @param body body传参，规定post请求，json格式
      * @param cb
      * @param asyn
+     * @param download 是否是下载文件 true: 是； 如果是的话就直接执行一次cb方法无回调数据，因为responsetext在blob时是无法获取的
      */
-    function init(method, url, data, body, cb, asyn) {
+    function init(method, url, data, body, cb, asyn, download) {
         // Comm.loading(true);
         url = t.Uri() + repair(url);
         let xhrMethod = ("BODY" === method ? "POST" : method);
         if (asyn == null) asyn = true;
         if (body == null) body = {};
-        data = (data == null) ? {} : data;
-        data[signNonce] = Comm.uuid();
+        if (data == null) data = {};
+        let isFormData = data instanceof FormData;
+        if (isFormData) data.append(signNonce, Comm.uuid()); else data[signNonce] = Comm.uuid();
 
         let xhr = new XMLHttpRequest();
+        if (download) xhr.responseType = "blob";
         xhr.onreadystatechange = function () {
             if (this.readyState === 4) {
                 if (this.status === 200) {
-                    finish(this.responseText, cb);
+                    if (download) {
+                        // type 默认由后端控制，从ContentType中拿
+                        downloadFile(xhr, null);
+                        cb();
+                    } else {
+                        finish(this.responseText, cb);
+                    }
                 } else {
                     error(this.status, cb);
                 }
@@ -189,19 +263,19 @@ var AJAX = new function () {
             data = null;
 
             xhr.open(xhrMethod, url, asyn);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            if (!isFormData) xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         } else if ("BODY" === method) {
             data = deobj(data, url);
             url += (url.indexOf("?") === -1 ? "?" : "&") + data;
             data = JSON.stringify(body);
 
             xhr.open(xhrMethod, url, asyn);
-            xhr.setRequestHeader("Content-Type", "application/json");
+            if (!isFormData) xhr.setRequestHeader("Content-Type", "application/json");
         } else {
             data = deobj(data, url);
 
             xhr.open(xhrMethod, url, asyn);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            if (!isFormData) xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         }
         xhr.setRequestHeader("Authorization", ag ? "Bearer " + ag : "Basic SFlDQk9CVmN4N2ltbUQzTDolTlVPaVQ5RiVPUCk2UGwhM1BDdw==");
 
@@ -273,28 +347,28 @@ var AJAX = new function () {
     };
 
     /*自定义初始化，一般用于框架内的组件调用，如：table，因为无法确认使用post还是get所以需要手动在组件内初始化，其他类似的也是这个道理*/
-    t.INIT = function (method, url, data, body, cb, asyn) {
-        init(method, url, data, body, cb, asyn);
+    t.INIT = function (method, api, data, body, cb, asyn) {
+        init(method, api, data, body, cb, asyn, false);
     };
     /*执行GET方法，一般用于从服务器获取数据，api长度尽量不超过1000字节*/
-    t.GET = function (api, data, cb, asyn) {
-        init(t.SUPPORT.GET, api, data, null, cb, asyn);
+    t.GET = function (api, data, cb, asyn, download) {
+        init(t.SUPPORT.GET, api, data, null, cb, asyn, download);
     };
     /*执行POST方法，一般用于向服务器提交数据，data建议不为空*/
-    t.POST = function (api, data, cb, asyn) {
-        init(t.SUPPORT.POST, api, data, null, cb, asyn);
+    t.POST = function (api, data, cb, asyn, download) {
+        init(t.SUPPORT.POST, api, data, null, cb, asyn, download);
     };
     /*执行POST BODY传参，data建议不为空*/
-    t.BODY = function (api, data, body, cb, asyn) {
-        init(t.SUPPORT.BODY, api, data, body, cb, asyn);
+    t.BODY = function (api, data, body, cb, asyn, download) {
+        init(t.SUPPORT.BODY, api, data, body, cb, asyn, download);
     };
     /*执行DELETE方法*/
     t.DELETE = function (api, data, cb, asyn) {
-        init(t.SUPPORT.DELETE, api, data, null, cb, asyn);
+        init(t.SUPPORT.DELETE, api, data, null, cb, asyn, false);
     };
     /*执行PUT方法，一般用于向服务器提交数据，data建议不为空*/
     t.PUT = function (api, data, cb, asyn) {
-        init(t.SUPPORT.PUT, api, data, null, cb, asyn);
+        init(t.SUPPORT.PUT, api, data, null, cb, asyn, false);
     };
     /*根据用户凭证判断用户是否登录*/
     t.isLogin = function () {
