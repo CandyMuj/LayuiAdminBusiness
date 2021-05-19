@@ -428,6 +428,9 @@ var Comm = {
             });
         }
     },
+    checkPhone: function (phoneNum) {
+        return /^1[0-9]{10}$/.test(phoneNum);  // true
+    },
     // 生成uuid
     uuid: function uuid() {
         return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
@@ -576,13 +579,33 @@ var Comm = {
             window[m].apply(null, a);
         }
     },
-    //显示加载s为需要显示的内容,s为false则表示关闭
-    loading: function (s) {
-        if (s) {
-            layer.load();
+    /**
+     * 加载层
+     *
+     * @param load  true：加载 false：关闭
+     * @param style 加载样式，可选值[1,2] 默认其他
+     */
+    loading: function (load, style) {
+        if (load) {
+            layer.load(style);
         } else {
             layer.closeAll('loading');
         }
+    },
+    /**
+     * 异步执行某个方法，并自动打开和关闭加载层
+     */
+    asyncLoding: function (fun, ...data) {
+        Comm.loading(true);
+        setTimeout(function () {
+            if (data) {
+                eval("fun('" + data.join("','") + "')");
+            } else {
+                fun();
+            }
+
+            Comm.loading(false);
+        }, 100);
     },
     msg: function (msg, type) {
         Comm.layer.msg(msg, {
