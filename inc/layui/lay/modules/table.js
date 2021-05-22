@@ -338,12 +338,13 @@ layui.define(["laytpl", "laypage", "layer", "form", "util"],
 
                     // a.contentType && 0 == a.contentType.indexOf("application/json") && (d = JSON.stringify(d)),
                     var d = r;
+                    let w = a.where;
                     if (AJAX.SUPPORT.BODY !== a.type) {
-                        d = t.extend(r, a.where);
-                        a.where = null;
+                        d = t.extend(r, w);
+                        w = null;
                     }
 
-                    AJAX.INIT(a.type, a.url, d, a.where, (res) => {
+                    AJAX.INIT(a.type, a.url, d, w, (res) => {
                         if (!res || res.code !== 1) {
                             i.layMain.html('<div class="' + f + '">数据接口请求异常：' + ((res && res.msg ? res.msg : "error")) + "</div>");
                             i.renderForm();
