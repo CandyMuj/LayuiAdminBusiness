@@ -846,13 +846,14 @@ window.onload = function () {
         /*search
         parm@id:表单id
         parm@table:tableid
+        parm@page:是否开启分页
         */
-        Comm.search = function (id, table) {
+        Comm.search = function (id, table, page) {
             id = id ? id : 'search-form'
             table = table ? table : 'table'
             //执行重载
             Comm.table.reload(table, {
-                page: {curr: 1}, //重新从第 1 页开始
+                page: !page ? {curr: 1} : false,  // 重新从第 1 页开始
                 where: Comm.GetData(id)
             });
         };
@@ -883,8 +884,9 @@ window.onload = function () {
         /*sort
         parm@id:表单id
         parm@table:tableid
+        parm@page:是否开启分页
         */
-        Comm.sort = function (id, table) {
+        Comm.sort = function (id, table, page) {
             id = id ? id : 'search-form'
             table = table ? table : 'table'
             /*sort*/
@@ -892,18 +894,18 @@ window.onload = function () {
                 var p = Comm.GetData(id);
                 p[obj.field] = obj.type
                 Comm.table.reload(table, {
-                    page: {curr: 1}, //重新从第 1 页开始
+                    page: !page ? {curr: 1} : false,  // 重新从第 1 页开始
                     initSort: obj,
                     where: p
                 });
             })
         };
-        Comm.reset = function () {
+        Comm.reset = function (page) {
             $("input").val("");
             $("select").val(-1);
             layui.form.render();
             Comm.table.reload('table', {
-                page: {curr: 1},//重新从第 1 页开始
+                page: !page ? {curr: 1} : false,  // 重新从第 1 页开始
                 where: Comm.GetData("search-form")
             });
         }
