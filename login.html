@@ -11,10 +11,10 @@
     <title>后台管理系统</title>
     <link rel="stylesheet" href="inc/layui/css/layui.css">
     <link rel="stylesheet" href="css/comm.css">
-    <link rel="icon" href="img/logo2.png" type="image/x-icon"/>
+    <link rel="icon" href="favicon.ico" type="image/x-icon"/>
     <style>
         .logo {
-            background-image: url("https://xxxx.png");
+            /*background-image: url("https://xxxx.png");*/
             background-repeat: no-repeat;
             width: 236px;
             height: 75px;
@@ -156,7 +156,9 @@
     <div style="float:left;margin: -3em 0 0 13em;">
         <div style="float:left;width: 0;height: 2em;border-left:2px solid #c1c1c1c1"></div>
         <div class="bold f28"
-             style="float:left;margin-left: 2.5em;margin-top: -7px;letter-spacing: 2px;color: #373b4e;">后台管理系统
+             style="float:left;margin-left: 2.5em;margin-top: -7px;letter-spacing: 2px;color: #373b4e;"
+        >
+            后台管理系统<span class="domain-name-cn"></span>
         </div>
     </div>
 </div>
@@ -200,11 +202,18 @@
     </fieldset>
 </div>
 <div class="col_lgray mart30">
-    <div class="flex_center">蜀ICP备xxxxx号-x</div>
     <div class="flex_center">
-        Copyright©2018-2020&nbsp;xxx.xx.&nbsp;All&nbsp;Rights&nbsp;Resenved&nbsp;
+        <a class="beian-miit" href="https://beian.miit.gov.cn" target="_blank"
+           style="color: #ABABAB"
+           onmouseover="this.style.color='#23527c'"
+           onmouseout="this.style.color='#ABABAB'"
+        ></a>
+    </div>
+    <div class="flex_center">
+        Copyright©2020-<span class="copy-right"></span>&nbsp;<span class="company"></span>.&nbsp;All&nbsp;Rights&nbsp;Resenved&nbsp;
     </div>
 </div>
+</body>
 <script type="text/html" id="formTpl2">
     <div id="forma1" class="layui-form" style="margin-top:30px;margin-right:60px;margin-left:60px;">
         <div style="width:100%">
@@ -294,6 +303,4 @@
         });
     }
 </script>
-</body>
-
 </html>

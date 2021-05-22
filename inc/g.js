@@ -2,6 +2,15 @@ var config = {
     // 配置环境：dev(本地开发环境) prod(正式生产环境)
     env: "prod",
     // --------------------------------------- 任何环境都通用的配置开始
+    // 网址信息设置
+    domain: {
+        nameCn: "",
+        nameEn: "",
+        beian: "",
+        company: "",
+        logo: "",
+        icon: ""
+    },
     pageSize: 10
 };
 (
@@ -909,7 +918,20 @@ window.onload = function () {
                 where: Comm.GetData("search-form")
             });
         }
-        //注册排序查询
+
+        // 设置页面信息
+        config.domain.nameCn && (document.title += (" - " + config.domain.nameCn));
+        config.domain.icon && $("head link[rel='icon']").prop("href", config.domain.icon);
+        config.domain.beian && $("body div a.beian-miit").html(config.domain.beian);
+        $("body div span.copy-right").html(new Date().format("yyyy"));
+        // login.html
+        config.domain.nameCn && $("body div span.domain-name-cn").html(" - " + config.domain.nameCn);
+        config.domain.company && $("body div span.company").html(config.domain.company);
+        config.domain.logo && $("body div div.logo").css("background-image", "url('" + config.domain.logo + "')");
+        // index.html
+        config.domain.nameEn && $("body div span.domain-name-en").html(" - " + config.domain.nameEn);
+
+        // 注册排序查询
         Comm.sort();
         Comm.exec("pageload");
 
