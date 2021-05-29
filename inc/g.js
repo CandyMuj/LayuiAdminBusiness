@@ -851,30 +851,21 @@ window.onload = function () {
             Comm.laydateinit(e);
         });
 
-        //处理页面table
-        /*search
-        parm@id:表单id
-        parm@table:tableid
-        parm@page:是否开启分页
-        */
-        Comm.search = function (id, table, page) {
-            id = id ? id : 'search-form'
-            table = table ? table : 'table'
-            //执行重载
-            Comm.table.reload(table, {
-                page: !page ? {curr: 1} : false,  // 重新从第 1 页开始
-                where: Comm.GetData(id)
-            });
-        };
-
-        // 获取table中选中的数据的id串
-        // onlyone:true 仅可选择一条数据
+        // 处理页面table
+        /**
+         * 获取table中选中的数据的id串
+         *
+         * @param id            数据表格中需要获取的字段的key
+         * @param table         table的id
+         * @param onlyone       true: 仅可选择一条数据
+         * @returns {string}    以逗号分割的字段的key对应的val值串
+         */
         Comm.checkIds = function (id, table, onlyone) {
             id = id ? id : 'id';
             table = table ? table : 'table';
 
             var d = Comm.table.checkStatus(table);  //获取选中的数据
-            if (onlyone && d.data.length != 1) {
+            if (onlyone && d.data.length !== 1) {
                 Comm.msg("请选择一条数据哦", 5);
                 return;
             }
@@ -890,11 +881,30 @@ window.onload = function () {
             return ids.join(",");
         };
 
-        /*sort
-        parm@id:表单id
-        parm@table:tableid
-        parm@page:是否开启分页
-        */
+        /**
+         * search
+         *
+         * @param id    表单id
+         * @param table table的id
+         * @param page  是否开启分页 默认：true
+         */
+        Comm.search = function (id, table, page) {
+            id = id ? id : 'search-form'
+            table = table ? table : 'table'
+            //执行重载
+            Comm.table.reload(table, {
+                page: (page || page === undefined) ? {curr: 1} : false,  //重新从第 1 页开始
+                where: Comm.GetData(id)
+            });
+        };
+
+        /**
+         * sort
+         *
+         * @param id    表单id
+         * @param table table的id
+         * @param page  是否开启分页 默认：true
+         */
         Comm.sort = function (id, table, page) {
             id = id ? id : 'search-form'
             table = table ? table : 'table'
@@ -903,21 +913,34 @@ window.onload = function () {
                 var p = Comm.GetData(id);
                 p[obj.field] = obj.type
                 Comm.table.reload(table, {
-                    page: !page ? {curr: 1} : false,  // 重新从第 1 页开始
+                    page: (page || page === undefined) ? {curr: 1} : false,  //重新从第 1 页开始
                     initSort: obj,
                     where: p
                 });
             })
         };
-        Comm.reset = function (page) {
-            $("input").val("");
-            $("select").val(-1);
+
+        /**
+         * reset
+         *
+         * @param id        表单id
+         * @param table     table的id
+         * @param reload    是否同时重新加载数据 true：是 默认：false
+         * @param page      是否开启分页 true：是 默认：true
+         */
+        Comm.reset = function (id, table, reload, page) {
+            id = id ? id : 'search-form';
+            table = table ? table : 'table';
+
+            $("#" + id + " input").val("");
+            $("#" + id + " select").val("");
             layui.form.render();
-            Comm.table.reload('table', {
-                page: !page ? {curr: 1} : false,  // 重新从第 1 页开始
-                where: Comm.GetData("search-form")
+
+            reload && Comm.table.reload(table, {
+                page: (page || page === undefined) ? {curr: 1} : false,  //重新从第 1 页开始
+                where: Comm.GetData(id)
             });
-        }
+        };
 
         // 设置页面信息
         config.domain.nameCn && (document.title += (" - " + config.domain.nameCn));
