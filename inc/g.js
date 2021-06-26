@@ -752,6 +752,8 @@ var Comm = {
             if ($(e).attr("name") != undefined) {
                 if ($(e).attr('laydate') != undefined) {
                     p[$(e).attr("name")] = $(e).val();
+                } else if ($(e).attr('type') === "checkbox") {
+                    p[$(e).attr("name")] = $(e).is(":checked");
                 } else {
                     p[$(e).attr("name")] = $(e).val();
                 }
