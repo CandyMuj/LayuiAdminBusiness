@@ -185,6 +185,7 @@
             <div class="layui-form-item flex_center">
                 <img id="verifyCode" src="">
                 <div class="layui-input-inline" style="width: 179px;margin-right:0px;">
+                    <input id="imgCodeId" name="imgCodeId" type="hidden">
                     <input type="text" name="imgCode" required lay-verify="required"
                            placeholder="请输入验证码" autocomplete="off" class="layui-input bor0">
                 </div>
@@ -265,17 +266,20 @@
     }
 
     function pageload() {
-        let client = new ClientJS();
+        // let client = new ClientJS();
 
         // 跟换验证码
         $('#verifyCode').click(() => {
-            $('#verifyCode').attr('src', AJAX.Url(IFACE.third.imgCode) + '?x=' + Math.floor(Math.random() * 100) + '&fingerprint=' + String(client.getFingerprint()));
+            let uuid = Comm.uuid();
+
+            $('#imgCodeId').val(uuid);
+            $('#verifyCode').attr('src', AJAX.Url(IFACE.third.imgCode) + '?imgCodeId=' + uuid);
         });
         $('#verifyCode').click();
 
         //监听提交
         Comm.form.on('submit(login)', function (data) {
-            data.field.fingerprint = String(client.getFingerprint());
+            // data.field.fingerprint = String(client.getFingerprint());
 
             //这里可以发起ajax请求进行登录验证
             AJAX.POST(IFACE.acccount.login, data.field, function (d) {
